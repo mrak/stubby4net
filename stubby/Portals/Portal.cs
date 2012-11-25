@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 
@@ -22,7 +21,7 @@ namespace stubby.Portals {
 
       public string BuildUri(string location, uint port) {
          var stringBuilder = new StringBuilder("");
-         
+
          stringBuilder.Append("http://");
          stringBuilder.Append(location);
          stringBuilder.Append(":");

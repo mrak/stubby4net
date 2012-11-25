@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System;
+using System.IO;
 using System.Threading;
 using CommandLine;
+using YamlDotNet.Core;
 using stubby.CLI;
 using stubby.Domain;
 using stubby.Portals;
@@ -14,9 +15,7 @@ namespace stubby {
       private static readonly Arguments Arguments = new Arguments();
 
       private static void Main(string[] args) {
-
          if (!CommandLineParser.Default.ParseArguments(args, Arguments)) return;
-
 
          SetUpPortals();
          StartPortals();
@@ -26,10 +25,21 @@ namespace stubby {
       private static void SetUpPortals() {
          var endpoints = new EndpointDb();
 
-         endpoints.Create(YamlParser.Parse(Arguments.Data));
-         
+         LoadEndpoints(endpoints);
+
          _admin = new Admin(endpoints);
          _stubs = new Stubs(endpoints);
+      }
+
+      private static void LoadEndpoints(EndpointDb endpoints) {
+         try {
+            endpoints.Create(YamlParser.FromFile(Arguments.Data));
+         } catch (FileNotFoundException) {
+            Out.Warn("File '" + Arguments.Data + "' couldn't be found. Ignoring...");
+         } catch (YamlException ex) {
+            Out.Error(ex.Message);
+            Environment.Exit(1);
+         }
       }
 
       private static void StartPortals() {
@@ -41,8 +51,7 @@ namespace stubby {
       }
 
       private static void Loop() {
-         while (true)
-         {
+         while (true) {
             _admin.Listen();
             _stubs.Listen();
          }

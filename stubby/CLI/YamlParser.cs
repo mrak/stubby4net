@@ -6,23 +6,37 @@ using stubby.Domain;
 namespace stubby.CLI {
 
    public static class YamlParser {
-      public static Endpoint[] Parse(string filename) {
-         var file = File.OpenRead(filename);
+      public static Endpoint[] FromFile(string filename) {
+         if (string.IsNullOrWhiteSpace(filename)) return new Endpoint[]{};
+
          var yaml = new YamlStream();
 
-         using (var streamReader = new StreamReader(file)) {
+         using (var streamReader = new StreamReader(filename)) {
             yaml.Load(streamReader);
          }
-         var yamlEndpoints = (YamlSequenceNode) yaml.Documents[0].RootNode;
 
-         var list = new List<Endpoint>();
+         return Parse(yaml);
+      }
 
-         foreach (YamlMappingNode yamlEndpoint in yamlEndpoints.Children) {
-            var endpoint = ParseEndpoint(yamlEndpoint);
-            if (endpoint != null) list.Add(endpoint);
+      public static Endpoint[] FromString(string data) {
+         var yaml = new YamlStream();
+
+         using (var streamReader = new StringReader(data)) {
+            yaml.Load(streamReader);
          }
 
-         return list.ToArray();
+         return Parse(yaml);
+      }
+
+      private static Endpoint[] Parse(YamlStream yaml) {
+         var parsed = new List<Endpoint>();
+
+         var yamlEndpoints = (YamlSequenceNode) yaml.Documents[0].RootNode;
+
+         foreach (YamlMappingNode yamlEndpoint in yamlEndpoints.Children)
+            parsed.Add(ParseEndpoint(yamlEndpoint));
+
+         return parsed.ToArray();
       }
 
       private static Endpoint ParseEndpoint(YamlMappingNode yamlEndpoint) {
@@ -87,13 +101,11 @@ namespace stubby.CLI {
                   response.Status = ushort.Parse(property.Value.ToString());
                   break;
                }
-               case "headers":
-                  {
-                     response.Headers = ParseDictionary((YamlMappingNode)property.Value, true);
-                     break;
-                  }
-               case "latency":
-                  {
+               case "headers": {
+                  response.Headers = ParseDictionary((YamlMappingNode) property.Value, true);
+                  break;
+               }
+               case "latency": {
                   response.Latency = ulong.Parse(property.Value.ToString());
                   break;
                }

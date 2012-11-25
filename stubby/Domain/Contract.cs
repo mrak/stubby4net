@@ -6,8 +6,7 @@ namespace stubby.Domain {
       private const string UrlRequired = "request.url is required.";
       private const string RequestRequired = "request is required.";
       private const string UrlSlash = "request.url must begin with '/'.";
-      private const string DefaultMethod = "GET";
-      public static readonly IList<string> Methods = new[] {"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS", "HEAD"};
+      public static readonly ICollection<string> Methods = new[] {"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS", "HEAD"};
       public const string MethodInvalid = "request.method must be a valid HTTP verb.";
 
       public static string[] Verify(Endpoint endpoint) {
@@ -21,7 +20,7 @@ namespace stubby.Domain {
          return errors.ToArray();
       }
 
-      private static void VerifyRequest(Request request, IList<string> errors) {
+      private static void VerifyRequest(Request request, ICollection<string> errors) {
          if (request == null) {
             errors.Add(RequestRequired);
             return;
@@ -31,7 +30,7 @@ namespace stubby.Domain {
          VerifyMethod(request.Method, errors);
       }
 
-      private static void VerifyUrl(string url, IList<string> errors) {
+      private static void VerifyUrl(string url, ICollection<string> errors) {
          if (string.IsNullOrWhiteSpace(url)) {
             errors.Add(UrlRequired);
             return;
@@ -41,7 +40,7 @@ namespace stubby.Domain {
             errors.Add(UrlSlash);
       }
 
-      private static void VerifyMethod(string method, IList<string> errors) {
+      private static void VerifyMethod(string method, ICollection<string> errors) {
          if (string.IsNullOrWhiteSpace(method)) return;
 
          if (Methods.Contains(method.ToUpper())) return;

@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLI\Arguments.cs" />
+    <Compile Include="CLI\Out.cs" />
     <Compile Include="CLI\YamlParser.cs" />
     <Compile Include="Domain\Contract.cs" />
     <Compile Include="Domain\Endpoint.cs" />
