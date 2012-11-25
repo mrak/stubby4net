@@ -3,7 +3,11 @@
 namespace stubby.CLI {
 
    public static class Out {
+      public static bool Mute = false;
+
       private static void Print(string message, ConsoleColor color) {
+         if (Mute) return;
+
          Console.ForegroundColor = color;
          Console.WriteLine(message);
       }

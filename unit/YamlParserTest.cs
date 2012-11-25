@@ -29,7 +29,13 @@ namespace stubby.unit {
       [Test]
       public void ShouldParseRequest_WithMethod() {
          var endpoint = YamlParser.FromFile("../../YAML/request-method.yaml")[0];
-         Assert.AreEqual("DELETE", endpoint.Request.Method);
+         Assert.AreEqual(new[] {"DELETE"}, endpoint.Request.Method);
+      }
+
+      [Test]
+      public void ShouldParseRequest_WithManyMethods() {
+         var endpoint = YamlParser.FromFile("../../YAML/request-methods.yaml")[0];
+         Assert.AreEqual(new[] {"GET", "HEAD"}, endpoint.Request.Method);
       }
 
       [Test]

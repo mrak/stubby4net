@@ -2,6 +2,7 @@
 using CommandLine.Text;
 
 namespace stubby.CLI {
+
    public class Arguments : CommandLineOptionsBase {
       [Option("a", "admin", DefaultValue = (uint) 8889, HelpText = "Port for admin portal. Defaults to 8889.")]
       public uint Admin { get; set; }
@@ -18,6 +19,9 @@ namespace stubby.CLI {
       [Option("w", "watch", HelpText = "Monitor supplied data file for changes and reload endpoints if necessary.")]
       public bool Watch { get; set; }
 
+      [Option("m", "mute", HelpText = "Monitor supplied data file for changes and reload endpoints if necessary.")]
+      public bool Mute { get; set; }
+
       [HelpOption]
       public string GetUsage() {
          var help = new HelpText {
@@ -25,9 +29,10 @@ namespace stubby.CLI {
             Copyright = new CopyrightInfo("Eric Mrak", 2012),
             AddDashesToOption = true
          };
-         help.AddPreOptionsLine("MIT License");
+         help.AddPreOptionsLine("Apache 2.0 License");
          help.AddOptions(this);
          return help;
       }
    }
+
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using YamlDotNet.RepresentationModel;
 using stubby.Domain;
 
@@ -7,7 +8,7 @@ namespace stubby.CLI {
 
    public static class YamlParser {
       public static Endpoint[] FromFile(string filename) {
-         if (string.IsNullOrWhiteSpace(filename)) return new Endpoint[]{};
+         if (string.IsNullOrWhiteSpace(filename)) return new Endpoint[] {};
 
          var yaml = new YamlStream();
 
@@ -68,7 +69,7 @@ namespace stubby.CLI {
                   break;
                }
                case "method": {
-                  request.Method = property.Value.ToString().ToUpper();
+                  request.Method = ParseMethod(property);
                   break;
                }
                case "file": {
@@ -90,6 +91,18 @@ namespace stubby.CLI {
             }
          }
          return request;
+      }
+
+      private static string[] ParseMethod(KeyValuePair<YamlNode, YamlNode> yamlMethod) {
+         var methods = new List<string>();
+
+         if (yamlMethod.Value.GetType() == typeof (YamlScalarNode))
+            methods.Add(yamlMethod.Value.ToString().ToUpper());
+
+         else if (yamlMethod.Value.GetType() == typeof (YamlSequenceNode))
+            methods.AddRange(from method in (YamlSequenceNode) yamlMethod.Value select method.ToString().ToUpper());
+
+         return methods.ToArray();
       }
 
       private static Response ParseResponse(YamlMappingNode yamlResponse) {

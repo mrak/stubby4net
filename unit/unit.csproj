@@ -64,7 +64,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ContractTest.cs" />
+    <Compile Include="EndointContractTest.cs" />
     <Compile Include="PortalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="YamlParserTest.cs" />
@@ -79,6 +79,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <Content Include="YAML\response-headers.yaml" />
+    <Content Include="YAML\request-methods.yaml" />
     <None Include="YAML\hello-world.yaml" />
     <None Include="YAML\multiple.yaml" />
     <None Include="YAML\response-file.yaml" />

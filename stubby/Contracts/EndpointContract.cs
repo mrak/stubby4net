@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using stubby.Domain;
 
-namespace stubby.Domain {
+namespace stubby.Contracts {
 
-   public static class Contract {
+   public static class EndpointContract {
       private const string UrlRequired = "request.url is required.";
       private const string RequestRequired = "request is required.";
       private const string UrlSlash = "request.url must begin with '/'.";
-      public static readonly ICollection<string> Methods = new[] {"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS", "HEAD"};
-      public const string MethodInvalid = "request.method must be a valid HTTP verb.";
+      public const string MethodInvalid = "request.method \"{0}\" is not an accepted HTTP verb.";
+
+      private static readonly ICollection<string> Methods = new[]
+      {"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS", "HEAD"};
 
       public static string[] Verify(Endpoint endpoint) {
          return Verify(new[] {endpoint});
@@ -40,12 +43,13 @@ namespace stubby.Domain {
             errors.Add(UrlSlash);
       }
 
-      private static void VerifyMethod(string method, ICollection<string> errors) {
-         if (string.IsNullOrWhiteSpace(method)) return;
+      private static void VerifyMethod(IEnumerable<string> methods, ICollection<string> errors) {
+         foreach (var method in methods) {
+            if (string.IsNullOrWhiteSpace(method)) continue;
+            if (Methods.Contains(method.ToUpper())) continue;
 
-         if (Methods.Contains(method.ToUpper())) return;
-
-         errors.Add(MethodInvalid);
+            errors.Add(string.Format(MethodInvalid, method));
+         }
       }
    }
 
