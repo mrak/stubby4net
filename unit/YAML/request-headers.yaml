@@ -1,0 +1,5 @@
+﻿-  request:
+      url: /anything
+      headers:
+         content-type: text/xml
+         user-agent: firefox(Mozilla)

@@ -1,0 +1,4 @@
+﻿-  request:
+      url: /anything
+   response:
+      latency: 987654321

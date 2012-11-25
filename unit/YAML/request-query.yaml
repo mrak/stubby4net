@@ -1,0 +1,5 @@
+﻿-  request:
+      url: /anything
+      query:
+         first: tada
+         second: voila

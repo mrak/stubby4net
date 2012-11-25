@@ -1,0 +1,129 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using YamlDotNet.RepresentationModel;
+using stubby.Domain;
+
+namespace stubby.CLI {
+
+   public static class YamlParser {
+      public static Endpoint[] Parse(string filename) {
+         var file = File.OpenRead(filename);
+         var yaml = new YamlStream();
+
+         using (var streamReader = new StreamReader(file)) {
+            yaml.Load(streamReader);
+         }
+         var yamlEndpoints = (YamlSequenceNode) yaml.Documents[0].RootNode;
+
+         var list = new List<Endpoint>();
+
+         foreach (YamlMappingNode yamlEndpoint in yamlEndpoints.Children) {
+            var endpoint = ParseEndpoint(yamlEndpoint);
+            if (endpoint != null) list.Add(endpoint);
+         }
+
+         return list.ToArray();
+      }
+
+      private static Endpoint ParseEndpoint(YamlMappingNode yamlEndpoint) {
+         var endpoint = new Endpoint();
+
+         foreach (var requestResponse in yamlEndpoint.Children) {
+            switch (requestResponse.Key.ToString()) {
+               case "request": {
+                  endpoint.Request = ParseRequest((YamlMappingNode) requestResponse.Value);
+                  break;
+               }
+               case "response": {
+                  endpoint.Response = ParseResponse((YamlMappingNode) requestResponse.Value);
+                  break;
+               }
+            }
+         }
+
+         return endpoint;
+      }
+
+      private static Request ParseRequest(YamlMappingNode yamlRequest) {
+         var request = new Request();
+
+         foreach (var property in yamlRequest) {
+            switch (property.Key.ToString()) {
+               case "url": {
+                  request.Url = property.Value.ToString();
+                  break;
+               }
+               case "method": {
+                  request.Method = property.Value.ToString().ToUpper();
+                  break;
+               }
+               case "file": {
+                  request.File = property.Value.ToString();
+                  break;
+               }
+               case "post": {
+                  request.Post = property.Value.ToString();
+                  break;
+               }
+               case "query": {
+                  request.Query = ParseDictionary((YamlMappingNode) property.Value);
+                  break;
+               }
+               case "headers": {
+                  request.Headers = ParseDictionary((YamlMappingNode) property.Value, true);
+                  break;
+               }
+            }
+         }
+         return request;
+      }
+
+      private static Response ParseResponse(YamlMappingNode yamlResponse) {
+         var response = new Response();
+
+         foreach (var property in yamlResponse) {
+            switch (property.Key.ToString()) {
+               case "status": {
+                  response.Status = ushort.Parse(property.Value.ToString());
+                  break;
+               }
+               case "headers":
+                  {
+                     response.Headers = ParseDictionary((YamlMappingNode)property.Value, true);
+                     break;
+                  }
+               case "latency":
+                  {
+                  response.Latency = ulong.Parse(property.Value.ToString());
+                  break;
+               }
+               case "body": {
+                  response.Body = property.Value.ToString();
+                  break;
+               }
+               case "file": {
+                  response.File = property.Value.ToString();
+                  break;
+               }
+            }
+         }
+
+         return response;
+      }
+
+      private static IDictionary<string, string> ParseDictionary(YamlMappingNode yamlMap, bool caseInsensitive = false) {
+         IDictionary<string, string> dictionary = new Dictionary<string, string>();
+
+         foreach (var property in yamlMap) {
+            var key = property.Key.ToString();
+
+            if (caseInsensitive) key = key.ToLower();
+
+            dictionary.Add(key, property.Value.ToString());
+         }
+
+         return dictionary;
+      }
+   }
+
+}

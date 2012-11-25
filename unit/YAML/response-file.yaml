@@ -1,0 +1,4 @@
+﻿-  request:
+      url: /anything
+   response:
+      file: path/to/response/body

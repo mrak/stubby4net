@@ -1,0 +1,14 @@
+﻿-  request:
+      url: /first
+   response:
+      status: 204
+
+-  request:
+      url: /second
+   response:
+      status: 200
+
+-  request:
+      url: /third
+   response:
+      status: 201

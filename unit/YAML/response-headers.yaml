@@ -1,0 +1,6 @@
+﻿-  request:
+      url: /anything
+   response:
+      headers:
+         content-type: application/json
+         Accept: application/json
