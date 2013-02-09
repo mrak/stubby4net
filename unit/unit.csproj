@@ -67,6 +67,7 @@
     <Compile Include="EndointContractTest.cs" />
     <Compile Include="PortalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EndpointDbTest.cs" />
     <Compile Include="YamlParserTest.cs" />
   </ItemGroup>
   <ItemGroup>

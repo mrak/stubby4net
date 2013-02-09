@@ -44,7 +44,7 @@ namespace stubby {
             throw new EndpointParsingException("Could not parse endpoints due to YAML errors.", ex);
          }
 
-         endpointsDb.Create(endpoints);
+         endpointsDb.Insert(endpoints);
       }
 
       private void StartPortals() {

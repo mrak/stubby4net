@@ -7,11 +7,20 @@ namespace stubby.Domain {
       private readonly object _lock = new object();
       private uint _nextId;
 
-      public void Create(Endpoint endpoint) {
-         Create(new[]{endpoint});
+      public void Purify(Endpoint endpoint) {
+//         if (endpoint.Response == null) endpoint.Response = new Response();
+
       }
 
-      public void Create(Endpoint[] endpoints) {}
+      public void Purify(Endpoint[] endpoints) {
+         foreach (var endpoint in endpoints) Purify(endpoint);
+      }
+
+      public void Insert(Endpoint endpoint) {}
+
+      public void Insert(Endpoint[] endpoints) {
+         foreach (var endpoint in endpoints) Insert(endpoint);
+      }
 
       private uint NextId() {
          lock (_lock) {
