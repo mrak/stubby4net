@@ -3,36 +3,54 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B47B00D9-D3BD-487E-AFA7-314DE8DE80B4}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>unit</RootNamespace>
+    <RootNamespace>stubby.unit</RootNamespace>
     <AssemblyName>unit</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="YamlDotNet.Core">
+      <HintPath>..\packages\YamlDotNet.Core.1.1.16\lib\YamlDotNet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet.RepresentationModel, Version=0.2.4453.29939, Culture=neutral, PublicKeyToken=2b53052c5884d7a1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\YamlDotNet.RepresentationModel.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
       <ItemGroup>
@@ -45,6 +63,37 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
+  <ItemGroup>
+    <Compile Include="EndointContractTest.cs" />
+    <Compile Include="PortalTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="YamlParserTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\stubby\stubby.csproj">
+      <Project>{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}</Project>
+      <Name>stubby</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <Content Include="YAML\response-headers.yaml" />
+    <Content Include="YAML\request-methods.yaml" />
+    <None Include="YAML\hello-world.yaml" />
+    <None Include="YAML\multiple.yaml" />
+    <None Include="YAML\response-file.yaml" />
+    <None Include="YAML\response-latency.yaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="YAML\request-file.yaml" />
+    <Content Include="YAML\request-headers.yaml" />
+    <Content Include="YAML\request-method.yaml" />
+    <Content Include="YAML\request-post.yaml" />
+    <Content Include="YAML\request-query.yaml" />
+    <Content Include="YAML\response-body.yaml" />
+    <Content Include="YAML\response-status.yaml" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
@@ -72,42 +121,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Compile Include="EndointContractTest.cs" />
-    <Compile Include="PortalTest.cs" />
-    <Compile Include="YamlParserTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="YAML\hello-world.yaml" />
-    <None Include="YAML\multiple.yaml" />
-    <None Include="YAML\request-file.yaml" />
-    <None Include="YAML\request-headers.yaml" />
-    <None Include="YAML\request-method.yaml" />
-    <None Include="YAML\request-methods.yaml" />
-    <None Include="YAML\request-post.yaml" />
-    <None Include="YAML\request-query.yaml" />
-    <None Include="YAML\response-body.yaml" />
-    <None Include="YAML\response-file.yaml" />
-    <None Include="YAML\response-headers.yaml" />
-    <None Include="YAML\response-latency.yaml" />
-    <None Include="YAML\response-status.yaml" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Moq">
-      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.core, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\stubby\stubby.csproj">
-      <Project>{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}</Project>
-      <Name>stubby</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

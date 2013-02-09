@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "stubby", "stubby\stubby.csproj", "{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unit", "unit\unit.csproj", "{B47B00D9-D3BD-487E-AFA7-314DE8DE80B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unit", "unit\unit.csproj", "{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,13 +15,10 @@ Global
 		{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B47B00D9-D3BD-487E-AFA7-314DE8DE80B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B47B00D9-D3BD-487E-AFA7-314DE8DE80B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B47B00D9-D3BD-487E-AFA7-314DE8DE80B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B47B00D9-D3BD-487E-AFA7-314DE8DE80B4}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = stubby\stubby.csproj
+		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
