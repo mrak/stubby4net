@@ -2,7 +2,7 @@
 
 namespace stubby.Domain {
 
-   public class Response {
+   internal class Response {
       public Response() {
          Headers = new Dictionary<string, string>();
       }

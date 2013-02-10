@@ -2,7 +2,7 @@
 
 namespace stubby.Domain {
 
-   public class EndpointDb {
+   internal class EndpointDb {
       private readonly ConcurrentDictionary<uint, Endpoint> _dictionary = new ConcurrentDictionary<uint, Endpoint>();
       private readonly object _lock = new object();
       private uint _nextId;

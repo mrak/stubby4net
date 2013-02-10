@@ -1,6 +1,6 @@
 ﻿namespace stubby.Domain {
 
-   public class Endpoint {
+   internal class Endpoint {
       public Endpoint() {
          Request = new Request();
          Response = new Response();

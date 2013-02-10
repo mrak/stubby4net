@@ -3,7 +3,7 @@ using CommandLine.Text;
 
 namespace stubby.CLI {
 
-   public class Arguments : CommandLineOptionsBase {
+   internal class Arguments : CommandLineOptionsBase, IArguments  {
       [Option("a", "admin", DefaultValue = (uint) 8889, HelpText = "Port for admin portal. Defaults to 8889.")]
       public uint Admin { get; set; }
 

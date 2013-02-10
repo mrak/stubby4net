@@ -4,30 +4,36 @@ using stubby.Domain;
 
 namespace stubby.Portals {
 
-   public class Stubs {
-      private readonly EndpointDb _endpointsDb;
-      private readonly Portal _portal;
+   internal class Stubs : IDisposable {
+      private readonly EndpointDb _endpointDb;
+      private readonly HttpListener _listener;
 
-      public Stubs(EndpointDb endpointsDb) : this(endpointsDb, new Portal(new HttpListener())) {}
+      public Stubs(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {}
 
-      public Stubs(EndpointDb endpointsDb, Portal portal) {
-         _endpointsDb = endpointsDb;
-         _portal = portal;
+      public Stubs(EndpointDb endpointDb, HttpListener listener) {
+         _endpointDb = endpointDb;
+         _listener = listener;
+      }
+
+      public void Dispose() {
+         _listener.Stop();
       }
 
       public void Start(string location, uint port) {
-         _portal.Start(location, port);
+         _listener.Prefixes.Add(PortalUtils.BuildUri(location, port));
+         _listener.Start();
+         _listener.BeginGetContext(AsyncHandler, _listener);
       }
 
-      public void Listen() {
-         _portal.RespondWith(RequestHandler);
-      }
-
-      private void RequestHandler(object incoming) {
-         var context = (HttpListenerContext) incoming;
-
+      private void ResponseHandler(HttpListenerContext context) {
          context.Response.Close();
          Console.WriteLine("stubs hit");
+      }
+
+      private void AsyncHandler(IAsyncResult result) {
+         var context = _listener.EndGetContext(result);
+         ResponseHandler(context);
+         _listener.BeginGetContext(AsyncHandler, _listener);
       }
    }
 

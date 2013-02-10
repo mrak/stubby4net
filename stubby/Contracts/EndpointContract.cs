@@ -3,7 +3,7 @@ using stubby.Domain;
 
 namespace stubby.Contracts {
 
-   public static class EndpointContract {
+   internal static class EndpointContract {
       private const string UrlRequired = "request.url is required.";
       private const string RequestRequired = "request is required.";
       private const string UrlSlash = "request.url must begin with '/'.";

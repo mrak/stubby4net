@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Threading;
 using YamlDotNet.Core;
 using stubby.CLI;
 using stubby.Domain;
@@ -12,15 +10,14 @@ namespace stubby {
    public class Stubby {
       private Admin _admin;
       private Stubs _stubs;
-      private Arguments _arguments;
+      private IArguments _arguments;
 
-      public void Start(Arguments arguments) {
+      public void Start(IArguments arguments) {
          _arguments = arguments;
          Out.Mute = _arguments.Mute;
 
          SetUpPortals();
          StartPortals();
-         Loop();
       }
 
       private void SetUpPortals() {
@@ -48,18 +45,8 @@ namespace stubby {
       }
 
       private void StartPortals() {
-         ThreadPool.SetMaxThreads(50, 1000);
-         ThreadPool.SetMinThreads(50, 50);
-
          _admin.Start(_arguments.Location, _arguments.Admin);
          _stubs.Start(_arguments.Location, _arguments.Stubs);
-      }
-
-      private void Loop() {
-         while (true) {
-            _admin.Listen();
-            _stubs.Listen();
-         }
       }
    }
 

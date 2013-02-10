@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using stubby.CLI;
 
-namespace stubby.unit {
+namespace unit {
 
    [TestFixture]
    public class YamlParserTest {

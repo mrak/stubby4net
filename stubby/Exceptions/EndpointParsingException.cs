@@ -2,7 +2,7 @@
 
 namespace stubby.Exceptions {
 
-   public class EndpointParsingException : Exception {
+   internal class EndpointParsingException : Exception {
       public EndpointParsingException() {}
 
       public EndpointParsingException(string message) : base(message) {}

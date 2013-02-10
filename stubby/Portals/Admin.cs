@@ -4,31 +4,38 @@ using stubby.Domain;
 
 namespace stubby.Portals {
 
-   public class Admin {
+   internal class Admin : IDisposable {
       private readonly EndpointDb _endpointDb;
-      private readonly Portal _portal;
+      private readonly HttpListener _listener;
 
-      public Admin(EndpointDb endpointDb) : this(endpointDb, new Portal()) {}
+      public Admin(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {}
 
-      public Admin(EndpointDb endpointDb, Portal portal) {
+      public Admin(EndpointDb endpointDb, HttpListener listener) {
          _endpointDb = endpointDb;
-         _portal = portal;
+         _listener = listener;
+      }
+
+      public void Dispose() {
+         _listener.Stop();
       }
 
       public void Start(string location, uint port) {
-         _portal.Start(location, port);
+         _listener.Prefixes.Add(PortalUtils.BuildUri(location, port));
+         _listener.Start();
+         _listener.BeginGetContext(AsyncHandler, _listener);
       }
 
-      public void Listen() {
-         _portal.RespondWith(RequestHandler);
-      }
-
-      private void RequestHandler(object incoming) {
-         var context = (HttpListenerContext) incoming;
-
+      private void ResponseHandler(HttpListenerContext context) {
          context.Response.Close();
          Console.WriteLine("admin hit");
       }
+
+      private void AsyncHandler(IAsyncResult result) {
+         var context = _listener.EndGetContext(result);
+         ResponseHandler(context);
+         _listener.BeginGetContext(AsyncHandler, _listener);
+      }
+
    }
 
 }

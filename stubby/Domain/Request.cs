@@ -2,7 +2,7 @@
 
 namespace stubby.Domain {
 
-   public class Request {
+   internal class Request {
       public Request() {
          Headers = new Dictionary<string, string>();
          Query = new Dictionary<string, string>();

@@ -2,7 +2,7 @@
 
 namespace stubby.CLI {
 
-   public class Program {
+   internal class Program {
       private static readonly Arguments Arguments = new Arguments();
       private static readonly Stubby Stubby = new Stubby();
 

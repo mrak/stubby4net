@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "stubby", "stubby\stubby.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unit", "unit\unit.csproj", "{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "integration", "integration\integration.csproj", "{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,7 @@ using stubby.Domain;
 
 namespace stubby.CLI {
 
-   public static class YamlParser {
+   internal static class YamlParser {
       public static Endpoint[] FromFile(string filename) {
          if (string.IsNullOrWhiteSpace(filename)) return new Endpoint[] {};
 

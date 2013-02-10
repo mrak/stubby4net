@@ -1,18 +1,10 @@
-﻿using System.Net;
-using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using stubby.Portals;
 
-namespace stubby.unit {
+namespace unit {
 
    [TestFixture]
-   public class PortalTest {
-      [SetUp]
-      public void BeforeEach() {
-         _portal = new Portal();
-      }
-
-      private Portal _portal;
+   public class PortalUtilsTest {
 
       [Test]
       public void BuildURI_ShouldConstructURIStringGivenLocationAndPort() {
@@ -21,7 +13,7 @@ namespace stubby.unit {
 
          var expected = "http://" + location + ":" + port + "/";
 
-         var actual = _portal.BuildUri(location, port);
+         var actual = PortalUtils.BuildUri(location, port);
 
          Assert.AreEqual(expected, actual);
       }
