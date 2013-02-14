@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.IO;
+using NUnit.Framework;
 using stubby.CLI;
 
 namespace unit {
@@ -14,8 +15,10 @@ namespace unit {
 
       [Test]
       public void ShouldParseRequest_WithFile() {
-         var endpoint = YamlParser.FromFile("../../YAML/request-file.yaml")[0];
-         Assert.AreEqual("path/to/file.txt", endpoint.Request.File);
+         const string file = "../../YAML/request-file.yaml";
+
+         var endpoint = YamlParser.FromFile(file)[0];
+         Assert.AreEqual(Path.GetFullPath(Path.Combine(file, "path/to/file.txt")), endpoint.Request.File);
       }
 
       [Test]
@@ -66,8 +69,9 @@ namespace unit {
 
       [Test]
       public void ShouldParseResponse_WithFile() {
-         var endpoint = YamlParser.FromFile("../../YAML/response-file.yaml")[0];
-         Assert.AreEqual("path/to/response/body", endpoint.Response.File);
+         const string file = "../../YAML/response-file.yaml";
+         var endpoint = YamlParser.FromFile(file)[0];
+         Assert.AreEqual(Path.GetFullPath(Path.Combine(file, "path/to/response/body")), endpoint.Response.File);
       }
 
       [Test]

@@ -7,7 +7,10 @@ using stubby.Domain;
 namespace stubby.CLI {
 
    internal static class YamlParser {
-      public static Endpoint[] FromFile(string filename) {
+      private const string CurrentDirectory = ".";
+
+      public static Endpoint[] FromFile(string filename)
+      {
          if (string.IsNullOrWhiteSpace(filename)) return new Endpoint[] {};
 
          var yaml = new YamlStream();
@@ -16,41 +19,42 @@ namespace stubby.CLI {
             yaml.Load(streamReader);
          }
 
-         return Parse(yaml);
+         return Parse(yaml, filename);
       }
 
       public static Endpoint[] FromString(string data) {
+
          var yaml = new YamlStream();
 
          using (var streamReader = new StringReader(data)) {
             yaml.Load(streamReader);
          }
 
-         return Parse(yaml);
+         return Parse(yaml, CurrentDirectory);
       }
 
-      private static Endpoint[] Parse(YamlStream yaml) {
+      private static Endpoint[] Parse(YamlStream yaml, string filename) {
          var parsed = new List<Endpoint>();
 
          var yamlEndpoints = (YamlSequenceNode) yaml.Documents[0].RootNode;
 
          foreach (YamlMappingNode yamlEndpoint in yamlEndpoints.Children)
-            parsed.Add(ParseEndpoint(yamlEndpoint));
+            parsed.Add(ParseEndpoint(yamlEndpoint, filename));
 
          return parsed.ToArray();
       }
 
-      private static Endpoint ParseEndpoint(YamlMappingNode yamlEndpoint) {
+      private static Endpoint ParseEndpoint(YamlMappingNode yamlEndpoint, string filename) {
          var endpoint = new Endpoint();
 
          foreach (var requestResponse in yamlEndpoint.Children) {
             switch (requestResponse.Key.ToString()) {
                case "request": {
-                  endpoint.Request = ParseRequest((YamlMappingNode) requestResponse.Value);
+                  endpoint.Request = ParseRequest((YamlMappingNode) requestResponse.Value, filename);
                   break;
                }
                case "response": {
-                  endpoint.Response = ParseResponse((YamlMappingNode) requestResponse.Value);
+                  endpoint.Response = ParseResponse((YamlMappingNode) requestResponse.Value, filename);
                   break;
                }
             }
@@ -59,7 +63,7 @@ namespace stubby.CLI {
          return endpoint;
       }
 
-      private static Request ParseRequest(YamlMappingNode yamlRequest) {
+      private static Request ParseRequest(YamlMappingNode yamlRequest, string filename) {
          var request = new Request();
 
          foreach (var property in yamlRequest) {
@@ -73,7 +77,7 @@ namespace stubby.CLI {
                   break;
                }
                case "file": {
-                  request.File = property.Value.ToString();
+                  request.File = ParseFile(property.Value.ToString(), filename);
                   break;
                }
                case "post": {
@@ -93,8 +97,13 @@ namespace stubby.CLI {
          return request;
       }
 
-      private static string[] ParseMethod(KeyValuePair<YamlNode, YamlNode> yamlMethod) {
+      private static string ParseFile(string file, string source) {
+         return Path.GetFullPath(Path.Combine(source, file));
+      }
+
+      private static List<string> ParseMethod(KeyValuePair<YamlNode, YamlNode> yamlMethod) {
          var methods = new List<string>();
+         
 
          if (yamlMethod.Value.GetType() == typeof (YamlScalarNode))
             methods.Add(yamlMethod.Value.ToString().ToUpper());
@@ -102,10 +111,10 @@ namespace stubby.CLI {
          else if (yamlMethod.Value.GetType() == typeof (YamlSequenceNode))
             methods.AddRange(from method in (YamlSequenceNode) yamlMethod.Value select method.ToString().ToUpper());
 
-         return methods.ToArray();
+         return methods;
       }
 
-      private static Response ParseResponse(YamlMappingNode yamlResponse) {
+      private static Response ParseResponse(YamlMappingNode yamlResponse, string filename) {
          var response = new Response();
 
          foreach (var property in yamlResponse) {
@@ -127,7 +136,7 @@ namespace stubby.CLI {
                   break;
                }
                case "file": {
-                  response.File = property.Value.ToString();
+                  response.File = ParseFile(property.Value.ToString(), filename);
                   break;
                }
             }

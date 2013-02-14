@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using stubby.Contracts;
 using stubby.Domain;
 
@@ -20,7 +21,7 @@ namespace unit {
       public void Verify_Method_ShouldReturnErrors_WhenMethodIsInvalid() {
          var expected = new[] {"request.method \"jeeber\" is not an accepted HTTP verb."};
 
-         _endpoint.Request.Method = new[] {"jeeber"};
+         _endpoint.Request.Method = new List<string> {"jeeber"};
 
          var actual = EndpointContract.Verify(_endpoint);
 
@@ -33,7 +34,7 @@ namespace unit {
             "request.method \"hello\" is not an accepted HTTP verb.",
             "request.method \"world\" is not an accepted HTTP verb."
          };
-         _endpoint.Request.Method = new[] {"put", "hello", "world", "delete"};
+         _endpoint.Request.Method = new List<string> {"put", "hello", "world", "delete"};
 
          var actual = EndpointContract.Verify(_endpoint);
 
@@ -42,7 +43,7 @@ namespace unit {
 
       [Test]
       public void Verify_Method_ShouldReturnNoErrors_WhenAllMethodAreValid() {
-         _endpoint.Request.Method = new[] {"put", "post", "delete"};
+         _endpoint.Request.Method = new List<string> {"put", "post", "delete"};
 
          var actual = EndpointContract.Verify(_endpoint);
 
@@ -54,7 +55,7 @@ namespace unit {
          var methods = new[] {"get", "put", "post", "delete", "patch", "options", "head"};
 
          foreach (var method in methods) {
-            _endpoint.Request.Method = new[] {method};
+            _endpoint.Request.Method = new List<string> {method};
 
             var actual = EndpointContract.Verify(_endpoint);
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 
 namespace stubby.Domain {
 
@@ -7,16 +8,13 @@ namespace stubby.Domain {
       private readonly object _lock = new object();
       private uint _nextId;
 
-      public void Purify(Endpoint endpoint) {
-//         if (endpoint.Response == null) endpoint.Response = new Response();
-
+      public void Insert(Endpoint endpoint) {
+         _dictionary.TryAdd(NextId(), endpoint);
       }
 
-      public void Purify(Endpoint[] endpoints) {
-         foreach (var endpoint in endpoints) Purify(endpoint);
+      public Endpoint Find(Endpoint incoming) {
+         return (from stored in _dictionary where stored.Value.Equals(incoming) select stored.Value).FirstOrDefault();
       }
-
-      public void Insert(Endpoint endpoint) {}
 
       public void Insert(Endpoint[] endpoints) {
          foreach (var endpoint in endpoints) Insert(endpoint);

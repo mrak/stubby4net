@@ -5,6 +5,7 @@ namespace stubby.Domain {
    internal class Response {
       public Response() {
          Headers = new Dictionary<string, string>();
+         Status = 200;
       }
 
       public ushort Status { get; set; }

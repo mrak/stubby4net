@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System;
+using CommandLine;
 
 namespace stubby.CLI {
 
@@ -9,6 +10,7 @@ namespace stubby.CLI {
       private static void Main(string[] args) {
          if (!CommandLineParser.Default.ParseArguments(args, Arguments)) return;
          Stubby.Start(Arguments);
+         while (true) {}
       }
    }
 
