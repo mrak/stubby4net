@@ -9,6 +9,7 @@ namespace stubby.Portals {
 
    internal static class PortalUtils {
       private const string RequestResponseFormat = "[{0}] {1} {2} [{3}]{4} {5}";
+      private const string ListeningString = "{0} portal listening at http://{1}:{2}";
       private const string IncomingArrow = "->";
       private const string OutgoingArrow = "<-";
       private static readonly string Version =
@@ -45,6 +46,16 @@ namespace stubby.Portals {
          stringBuilder.Append("/");
 
          return stringBuilder.ToString();
+      }
+
+      public static byte[] GetBytes(string str) {
+         var bytes = new byte[str.Length*sizeof (char)];
+         Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+         return bytes;
+      }
+
+      public static void PrintListening(string name, string location, uint port) {
+         Out.Status(string.Format(ListeningString, name, location, port));
       }
    }
 

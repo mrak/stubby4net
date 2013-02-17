@@ -10,6 +10,11 @@ namespace stubby.CLI {
 
          Console.ForegroundColor = color;
          Console.WriteLine(message);
+         Console.ResetColor();
+      }
+
+      public static void Linefeed() {
+         if (!Mute) Console.WriteLine();
       }
 
       public static void Warn(string message) {

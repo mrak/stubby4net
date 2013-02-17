@@ -9,6 +9,7 @@ using stubby.Domain;
 namespace stubby.Portals {
 
    internal class Stubs : IDisposable {
+      private const string Name = "stubs";
       private const string UnregisteredEndoint = "is not a registered endpoint.";
       private readonly EndpointDb _endpointDb;
       private readonly HttpListener _listener;
@@ -32,10 +33,12 @@ namespace stubby.Portals {
          _listener.Prefixes.Add(PortalUtils.BuildUri(location, port));
          _listener.Start();
          _listener.BeginGetContext(AsyncHandler, _listener);
+
+         PortalUtils.PrintListening(Name, location, port);
       }
 
       private void ResponseHandler(HttpListenerContext context) {
-         PortalUtils.PrintIncoming("stubs", context.Request.Url.AbsolutePath, context.Request.HttpMethod);
+         PortalUtils.PrintIncoming(Name, context.Request.Url.AbsolutePath, context.Request.HttpMethod);
          PortalUtils.AddServerHeader(context.Response);
 
          var found = FindEndpoint(context);
@@ -43,7 +46,7 @@ namespace stubby.Portals {
          if (found == null) {
             context.Response.StatusCode = (int) HttpStatusCode.NotFound;
             context.Response.Close();
-            PortalUtils.PrintOutgoing("stubs", context.Request.Url.AbsolutePath, context.Response.StatusCode,
+            PortalUtils.PrintOutgoing(Name, context.Request.Url.AbsolutePath, context.Response.StatusCode,
                                       UnregisteredEndoint);
             return;
          }
@@ -51,7 +54,7 @@ namespace stubby.Portals {
          context.Response.StatusCode = found.Response.Status;
          context.Response.Headers = CreateWebHeaderCollection(found.Response.Headers);
          WriteResponseBody(context.Response, found.Response);
-         PortalUtils.PrintOutgoing("stubs", context.Request.Url.AbsolutePath, context.Response.StatusCode);
+         PortalUtils.PrintOutgoing(Name, context.Request.Url.AbsolutePath, context.Response.StatusCode);
       }
 
       private Endpoint FindEndpoint(HttpListenerContext context) {

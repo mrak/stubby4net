@@ -45,8 +45,10 @@ namespace stubby {
       }
 
       private void StartPortals() {
+         Out.Linefeed();
          _admin.Start(_arguments.Location, _arguments.Admin);
          _stubs.Start(_arguments.Location, _arguments.Stubs);
+         Out.Linefeed();
       }
    }
 
