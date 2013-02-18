@@ -10,8 +10,8 @@ namespace stubby.CLI {
       private const string CurrentDirectory = ".";
       private static string _fileDirectory = CurrentDirectory;
 
-      public static Endpoint[] FromFile(string filename) {
-         if (string.IsNullOrWhiteSpace(filename)) return new Endpoint[] {};
+      public static IList<Endpoint> FromFile(string filename) {
+         if (string.IsNullOrWhiteSpace(filename)) return new List<Endpoint>();
 
          _fileDirectory = Path.GetDirectoryName(filename);
 
@@ -24,7 +24,7 @@ namespace stubby.CLI {
          return Parse(yaml);
       }
 
-      public static Endpoint[] FromString(string data) {
+      public static IList<Endpoint> FromString(string data) {
          _fileDirectory = CurrentDirectory;
 
          var yaml = new YamlStream();
@@ -36,11 +36,11 @@ namespace stubby.CLI {
          return Parse(yaml);
       }
 
-      private static Endpoint[] Parse(YamlStream yaml) {
+      private static IList<Endpoint> Parse(YamlStream yaml) {
          var yamlEndpoints = (YamlSequenceNode) yaml.Documents[0].RootNode;
 
          return
-            (from YamlMappingNode yamlEndpoint in yamlEndpoints.Children select ParseEndpoint(yamlEndpoint)).ToArray();
+            (from YamlMappingNode yamlEndpoint in yamlEndpoints.Children select ParseEndpoint(yamlEndpoint)) as IList<Endpoint>;
       }
 
       private static Endpoint ParseEndpoint(YamlMappingNode yamlEndpoint) {

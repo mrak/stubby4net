@@ -10,7 +10,7 @@ namespace unit {
       public void ShouldParseMultipleEndpoints() {
          var endpoints = YamlParser.FromFile("../../YAML/multiple.yaml");
 
-         Assert.AreEqual(3, endpoints.Length);
+         Assert.AreEqual(3, endpoints.Count);
       }
 
       [Test]

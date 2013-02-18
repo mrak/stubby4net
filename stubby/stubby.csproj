@@ -43,6 +43,8 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.XML" />
     <Reference Include="YamlDotNet.Core">
       <HintPath>packages\YamlDotNet.Core.1.1.16\lib\YamlDotNet.Core.dll</HintPath>
     </Reference>

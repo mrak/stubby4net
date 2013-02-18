@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using stubby.CLI;
+using stubby.Domain;
 
 namespace stubby.Portals {
 
@@ -34,6 +38,20 @@ namespace stubby.Portals {
 
       public static void AddServerHeader(HttpListenerResponse response) {
          response.AddHeader("Server", "stubby4net/" + Version);
+      }
+
+      public static void AddJsonHeader(HttpListenerResponse response) {
+         response.Headers.Set("Content-Type", "application/json");
+      }
+
+      public static void SerializeToJson<T>(T entity, HttpListenerResponse response) {
+            var serializer = new DataContractJsonSerializer(typeof (T));
+            AddJsonHeader(response);
+
+            using (var ms = new MemoryStream()) {
+               serializer.WriteObject(ms, entity);
+               response.OutputStream.Write(ms.ToArray(), 0, (int) ms.Length);
+            }
       }
 
       public static string BuildUri(string location, uint port) {

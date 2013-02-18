@@ -1,19 +1,47 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace stubby.Domain {
 
-   internal class Request {
-      public Request() {
-         Headers = new Dictionary<string, string>();
-         Query = new Dictionary<string, string>();
-         Method = new List<string> {"GET"};
+   [DataContract]
+   public class Request {
+      private IDictionary<string, string> _headers = new Dictionary<string, string>();
+      private IList<string> _method = new List<string>();
+      private IDictionary<string, string> _query = new Dictionary<string, string>();
+      private string _url;
+
+      [DataMember]
+      public string Url {
+         get { return _url; }
+         set {
+            if (value == null) _url = "/";
+            else if (!value.StartsWith("/")) _url = "/" + value;
+            else _url = value;
+         }
       }
 
-      public string Url { get; set; }
-      public List<string> Method { get; set; }
-      public IDictionary<string, string> Headers { get; set; }
-      public IDictionary<string, string> Query { get; set; }
+      [DataMember]
+      public IList<string> Method {
+         get { return _method ?? (_method = new List<string> {"GET"}); }
+         set { _method = value; }
+      }
+
+      [DataMember]
+      public IDictionary<string, string> Headers {
+         get { return _headers ?? (_headers = new Dictionary<string, string>()); }
+         set { _headers = value; }
+      }
+
+      [DataMember]
+      public IDictionary<string, string> Query {
+         get { return _query ?? (_query = new Dictionary<string, string>()); }
+         set { _query = value; }
+      }
+
+      [DataMember]
       public string Post { get; set; }
+
+      [DataMember]
       public string File { get; set; }
 
       public override bool Equals(object o) {
@@ -33,7 +61,7 @@ namespace stubby.Domain {
          try {
             return System.IO.File.ReadAllText(File) == other.Post;
          } catch {
-            if (Post != null && Post != other.Post) return false;            
+            if (Post != null && Post != other.Post) return false;
          }
 
          return true;

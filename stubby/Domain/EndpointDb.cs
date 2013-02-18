@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using stubby.CLI;
 
@@ -10,19 +11,67 @@ namespace stubby.Domain {
       private readonly object _lock = new object();
       private uint _nextId;
 
-      public void Insert(Endpoint endpoint) {
-         if (!_dictionary.TryAdd(NextId(), endpoint)) return;
+      public bool Insert(Endpoint endpoint) {
+         uint i;
+         return Insert(endpoint, out i);
+      }
+
+      public bool Insert(Endpoint endpoint, out uint id) {
+         id = NextId();
+         if (!_dictionary.TryAdd(id, endpoint)) return false;
 
          var methods = endpoint.Request.Method.Aggregate("", (current, verb) => current + (" " + verb));
          Out.Notice(string.Format(Loaded, methods, endpoint.Request.Url));
+         return true;
       }
 
       public Endpoint Find(Endpoint incoming) {
          return (from stored in _dictionary where stored.Value.Equals(incoming) select stored.Value).FirstOrDefault();
       }
 
-      public void Insert(Endpoint[] endpoints) {
-         foreach (var endpoint in endpoints) Insert(endpoint);
+      public Endpoint Fetch(uint id) {
+         Endpoint fetched;
+         _dictionary.TryGetValue(id, out fetched);
+         return fetched;
+      }
+
+      public bool Replace(uint id, Endpoint endpoint) {
+         if (!_dictionary.ContainsKey(id)) return false;
+
+         _dictionary[id] = endpoint;
+         return true;
+      }
+
+      public bool Replace(IEnumerable<KeyValuePair<uint, Endpoint>> endpoints) {
+         return endpoints.All(pair => Replace(pair.Key, pair.Value));
+      }
+
+      public IList<Endpoint> Fetch() {
+         return _dictionary.Select(endpoint => endpoint.Value).ToList();
+      }
+
+      public void Delete() {
+         _dictionary.Clear();
+      }
+
+      public bool Delete(uint id) {
+         Endpoint removed;
+         return _dictionary.TryRemove(id, out removed);
+      }
+
+      public bool Insert(IEnumerable<Endpoint> endpoints) {
+         IList<uint> ids;
+         return Insert(endpoints, out ids);
+      }
+
+      public bool Insert(IEnumerable<Endpoint> endpoints, out IList<uint> ids) {
+         ids = new List<uint>();
+         foreach (var endpoint in endpoints) {
+            uint id;
+            if (!Insert(endpoint, out id)) return false;
+            ids.Add(id);
+         }
+         return true;
       }
 
       private uint NextId() {

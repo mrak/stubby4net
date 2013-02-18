@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Runtime.Serialization.Json;
+using System.Text.RegularExpressions;
 using stubby.Domain;
 
 namespace stubby.Portals {
 
    internal class Admin : IDisposable {
       private const string Name = "admin";
-      private const string Ping = "/ping";
+      private const string PingUrl = "/ping";
+      private const string StatusUrl = "/status";
       private const string PlainText = "text/plain";
+      private const string Html = "text/html";
+      private const string Root = "/";
       private const string AllowedMethods = "GET, HEAD, POST, PUT, DELETE";
+      private const string IdPattern = @"^\/([0-9]+)?$";
+      private const string AcceptableUrls = @"^\/(ping|status|[0-9]*)$";
       private static readonly byte[] Pong = PortalUtils.GetBytes("pong");
       private readonly EndpointDb _endpointDb;
       private readonly HttpListener _listener;
@@ -21,11 +29,11 @@ namespace stubby.Portals {
          _endpointDb = endpointDb;
          _listener = listener;
          _methods = new Dictionary<string, Action<HttpListenerContext>> {
-            {"GET", goGET},
-            {"HEAD", goGET},
-            {"POST", goPOST},
-            {"PUT", goPUT},
-            {"DELETE", goDELETE}
+            {"GET", GoGet},
+            {"HEAD", GoGet},
+            {"POST", GoPost},
+            {"PUT", GoPUT},
+            {"DELETE", GoDelete}
          };
       }
 
@@ -41,39 +49,74 @@ namespace stubby.Portals {
          PortalUtils.PrintListening(Name, location, port);
       }
 
+      public void Stop() {
+         _listener.Stop();
+      }
+
+
       private void ResponseHandler(HttpListenerContext context) {
          PortalUtils.PrintIncoming(Name, context.Request.Url.AbsolutePath, context.Request.HttpMethod);
          PortalUtils.AddServerHeader(context.Response);
 
-         if (_methods.ContainsKey(context.Request.HttpMethod)) _methods[context.Request.HttpMethod](context);
-         else goInvalid(context);
+         if (!Regex.IsMatch(context.Request.Url.AbsolutePath, AcceptableUrls)) GoInvalid(context);
+         else if (_methods.ContainsKey(context.Request.HttpMethod)) _methods[context.Request.HttpMethod](context);
+         else GoInvalid(context);
 
          context.Response.Close();
          PortalUtils.PrintOutgoing(Name, context.Request.Url.AbsolutePath, context.Response.StatusCode);
       }
 
-      private void goGET(HttpListenerContext context) {
+      private void GoGet(HttpListenerContext context) {
          var url = context.Request.Url.AbsolutePath;
 
-         if (url.Equals(Ping)) {
-            goPing(context);
+         if (url.Equals(PingUrl)) {
+            GoPing(context);
             return;
          }
+
+         if (url.Equals(StatusUrl)) {
+            GoStatus(context);
+            return;
+         }
+
+         if (url.Equals(Root)) {
+            var all = _endpointDb.Fetch();
+            PortalUtils.SerializeToJson(all, context.Response);
+            return;
+         }
+
+         var id = uint.Parse(url.Substring(1));
+         var endpoint = _endpointDb.Fetch(id);
+
+         if (endpoint == null) {
+            GoNotFound(context);
+            return;
+         }
+
+         if (context.Request.HttpMethod.Equals("GET")) PortalUtils.SerializeToJson(endpoint, context.Response);
       }
 
-      private void goPOST(HttpListenerContext context) {}
-      private void goPUT(HttpListenerContext context) {}
-      private void goDELETE(HttpListenerContext context) {}
+      private static void GoPost(HttpListenerContext context) {}
+      private static void GoPUT(HttpListenerContext context) {}
+      private static void GoDelete(HttpListenerContext context) {}
 
-      private void goInvalid(HttpListenerContext context) {
+      private static void GoInvalid(HttpListenerContext context) {
          context.Response.StatusCode = (int) HttpStatusCode.MethodNotAllowed;
          context.Response.AddHeader("Allow", AllowedMethods);
       }
 
-      private void goPing(HttpListenerContext context) {
+      private static void GoNotFound(HttpListenerContext context) {
+         context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+      }
+
+      private static void GoPing(HttpListenerContext context) {
          context.Response.StatusCode = (int) HttpStatusCode.OK;
-         context.Response.ContentType = PlainText;
-         context.Response.Close(Pong, false);
+         context.Response.OutputStream.Write(Pong, 0, Pong.Length);
+      }
+
+      private static void GoStatus(HttpListenerContext context) {
+         context.Response.StatusCode = (int) HttpStatusCode.OK;
+         context.Response.ContentType = Html;
       }
 
       private void AsyncHandler(IAsyncResult result) {
