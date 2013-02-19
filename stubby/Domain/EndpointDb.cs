@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using stubby.CLI;
+using Defaults = stubby.Contracts.EndpointContract;
 
 namespace stubby.Domain {
 
@@ -18,10 +19,27 @@ namespace stubby.Domain {
 
       public bool Insert(Endpoint endpoint, out uint id) {
          id = NextId();
-         if (!_dictionary.TryAdd(id, endpoint)) return false;
+         var verified = Defaults.Verify(endpoint);
 
-         var methods = endpoint.Request.Method.Aggregate("", (current, verb) => current + (" " + verb));
-         Out.Notice(string.Format(Loaded, methods, endpoint.Request.Url));
+         if (!_dictionary.TryAdd(id, verified)) return false;
+
+         var methods = verified.Request.Method.Aggregate("", (current, verb) => current + (" " + verb));
+         Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
+         return true;
+      }
+
+      public bool Insert(IEnumerable<Endpoint> endpoints) {
+         IList<uint> ids;
+         return Insert(endpoints, out ids);
+      }
+
+      public bool Insert(IEnumerable<Endpoint> endpoints, out IList<uint> ids) {
+         ids = new List<uint>();
+         foreach (var endpoint in endpoints) {
+            uint id;
+            if (!Insert(endpoint, out id)) return false;
+            ids.Add(id);
+         }
          return true;
       }
 
@@ -57,21 +75,6 @@ namespace stubby.Domain {
       public bool Delete(uint id) {
          Endpoint removed;
          return _dictionary.TryRemove(id, out removed);
-      }
-
-      public bool Insert(IEnumerable<Endpoint> endpoints) {
-         IList<uint> ids;
-         return Insert(endpoints, out ids);
-      }
-
-      public bool Insert(IEnumerable<Endpoint> endpoints, out IList<uint> ids) {
-         ids = new List<uint>();
-         foreach (var endpoint in endpoints) {
-            uint id;
-            if (!Insert(endpoint, out id)) return false;
-            ids.Add(id);
-         }
-         return true;
       }
 
       private uint NextId() {

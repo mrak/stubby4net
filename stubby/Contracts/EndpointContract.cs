@@ -1,73 +1,66 @@
 using System.Collections.Generic;
+using System.Linq;
 using stubby.Domain;
 
 namespace stubby.Contracts {
 
    internal static class EndpointContract {
-      private const string UrlRequired = "request.url is required.";
-      private const string RequestRequired = "request is required.";
-      private const string UrlSlash = "request.url must begin with '/'.";
-      private const string MethodInvalid = "request.method \"{0}\" is not an accepted HTTP verb.";
-      private const string StatusInvalid = "response.status must be between 100 and 599.";
+      public static Endpoint Verify(Endpoint endpoint) {
+         endpoint = endpoint ?? new Endpoint();
 
-      private static readonly ICollection<string> Methods = new[]
-      {"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS", "HEAD"};
-
-      public static IList<string> Verify(Endpoint endpoint) {
-         return Verify(new List<Endpoint> {endpoint});
+         return new Endpoint {Request = VerifyRequest(endpoint.Request), Response = VerifyResponse(endpoint.Response)};
       }
 
-      public static IList<string> Verify(IEnumerable<Endpoint> endpoints) {
-         var errors = new List<string>();
+      private static Request VerifyRequest(Request request) {
+         request = request ?? new Request();
 
-         foreach (var endpoint in endpoints) {
-            VerifyRequest(endpoint.Request, errors);
-            VerifyResponse(endpoint.Response, errors);
+         return new Request {
+            Url = VerifyUrl(request.Url),
+            Query = request.Query ?? new Dictionary<string, string>(),
+            Headers = request.Headers ?? new Dictionary<string, string>(),
+            Post = request.Post,
+            File = request.File,
+            Method = VerifyMethod(request.Method)
+         };
+      }
+
+      private static string VerifyUrl(string url) {
+         if (string.IsNullOrWhiteSpace(url)) return "/";
+         if (!url.StartsWith("/")) return "/" + url;
+         return url;
+      }
+
+      private static IList<string> VerifyMethod(ICollection<string> methods) {
+         IList<string> verified = new List<string>();
+
+         if (methods == null || methods.Count.Equals(0)) {
+            verified.Add("GET");
+            return verified;
          }
-         return errors;
+
+         foreach (var method in methods.Where(method => !string.IsNullOrWhiteSpace(method)))
+            verified.Add(method.ToUpper());
+
+         return verified;
       }
 
-      private static void VerifyResponse(Response response, ICollection<string> errors) {
-         if (response == null) return;
+      private static Response VerifyResponse(Response response) {
+         response = response ?? new Response();
 
-         VerifyStatus(response.Status, errors);
+         return new Response {
+            Status = VerifyStatus(response.Status),
+            Headers = response.Headers ?? new Dictionary<string, string>(),
+            Body = response.Body,
+            Latency = response.Latency,
+            File = response.File
+         };
       }
 
-      private static void VerifyStatus(ushort status, ICollection<string> errors) {
-         if (status == 0) return;
-
+      private static ushort VerifyStatus(ushort status) {
          if (status < 100 || status >= 600)
-            errors.Add(StatusInvalid);
-      }
+            return 200;
 
-      private static void VerifyRequest(Request request, ICollection<string> errors) {
-         if (request == null) {
-            errors.Add(RequestRequired);
-            return;
-         }
-
-         VerifyUrl(request.Url, errors);
-         VerifyMethod(request.Method, errors);
-      }
-
-      private static void VerifyUrl(string url, ICollection<string> errors) {
-         if (string.IsNullOrWhiteSpace(url)) {
-            errors.Add(UrlRequired);
-            return;
-         }
-
-         if (!url.StartsWith("/"))
-            errors.Add(UrlSlash);
-      }
-
-      private static void VerifyMethod(IEnumerable<string> methods, ICollection<string> errors) {
-         foreach (var method in methods) {
-            if (string.IsNullOrWhiteSpace(method)) continue;
-            if (Methods.Contains(method.ToUpper())) continue;
-
-            errors.Add(string.Format(MethodInvalid, method));
-         }
+         return status;
       }
    }
-
 }
