@@ -3,12 +3,12 @@
 namespace stubby.CLI {
 
    internal class Program {
-      private static readonly Arguments Arguments = new Arguments();
-      private static readonly Stubby Stubby = new Stubby();
-
       private static void Main(string[] args) {
-         if (!CommandLineParser.Default.ParseArguments(args, Arguments)) return;
-         Stubby.Start(Arguments);
+         var arguments = new Arguments();
+         if (!CommandLineParser.Default.ParseArguments(args, arguments)) return;
+
+         var stubby = new Stubby(arguments);
+         stubby.Start();
          while (true) {}
       }
    }

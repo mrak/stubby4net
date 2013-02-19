@@ -12,8 +12,8 @@ namespace integration
             Admin = 8889,
             Stubs = 8882
          };
-         var stubby = new Stubby();
-         stubby.Start(args);
+         var stubby = new Stubby(args);
+         stubby.Start();
          while (true) {}
          return;
       }

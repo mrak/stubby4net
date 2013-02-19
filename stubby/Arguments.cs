@@ -14,7 +14,7 @@
       ///</summary>
       public string Location { get; set; }
       ///<summary>
-      /// Data file to pre-load endpoints. YAML format.
+      /// Data file location to pre-load endpoints. YAML format.
       ///</summary>
       public string Data { get; set; }
       ///<summary>
