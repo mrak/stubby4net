@@ -5,23 +5,16 @@ namespace stubby.Domain {
 
    [DataContract]
    public class Response {
-      private IDictionary<string, string> _headers = new Dictionary<string, string>();
-      private ushort _status = 200;
-
-      [DataMember]
-      public ushort Status {
-         get { return _status; }
-         set {
-            if (value < 100 || value > 599) _status = 200;
-            else _status = value;
-         }
+      public Response() {
+         Status = 200;
+         Headers = new Dictionary<string, string>();
       }
 
       [DataMember]
-      public IDictionary<string, string> Headers {
-         get { return _headers ?? (_headers = new Dictionary<string, string>()); }
-         set { _headers = value; }
-      }
+      public ushort Status { get; set; }
+
+      [DataMember]
+      public IDictionary<string, string> Headers { get; set; }
 
       [DataMember]
       public ulong Latency { get; set; }

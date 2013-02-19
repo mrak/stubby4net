@@ -5,44 +5,18 @@ namespace stubby.Domain {
 
    [DataContract]
    public class Request {
-      private IDictionary<string, string> _headers = new Dictionary<string, string>();
-      private IList<string> _method = new List<string>();
-      private IDictionary<string, string> _query = new Dictionary<string, string>();
-      private string _url;
-
-      [DataMember]
-      public string Url {
-         get { return _url; }
-         set {
-            if (value == null) _url = "/";
-            else if (!value.StartsWith("/")) _url = "/" + value;
-            else _url = value;
-         }
+      public Request() {
+         Method = new List<string> {"GET"};
+         Query = new Dictionary<string, string>();
+         Headers = new Dictionary<string, string>();
       }
 
-      [DataMember]
-      public IList<string> Method {
-         get { return _method ?? (_method = new List<string> {"GET"}); }
-         set { _method = value; }
-      }
-
-      [DataMember]
-      public IDictionary<string, string> Headers {
-         get { return _headers ?? (_headers = new Dictionary<string, string>()); }
-         set { _headers = value; }
-      }
-
-      [DataMember]
-      public IDictionary<string, string> Query {
-         get { return _query ?? (_query = new Dictionary<string, string>()); }
-         set { _query = value; }
-      }
-
-      [DataMember]
-      public string Post { get; set; }
-
-      [DataMember]
-      public string File { get; set; }
+      [DataMember] public string Url { get; set; }
+      [DataMember] public IList<string> Method { get; set; }
+      [DataMember] public IDictionary<string, string> Headers { get; set; }
+      [DataMember] public IDictionary<string, string> Query { get; set; }
+      [DataMember] public string Post { get; set; }
+      [DataMember] public string File { get; set; }
 
       public override bool Equals(object o) {
          var other = (Request) o;

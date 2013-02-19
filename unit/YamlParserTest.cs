@@ -18,7 +18,7 @@ namespace unit {
          const string file = "../../YAML/request-file.yaml";
 
          var endpoint = YamlParser.FromFile(file)[0];
-         Assert.AreEqual(Path.GetFullPath(Path.Combine(file, "path/to/file.txt")), endpoint.Request.File);
+         Assert.AreEqual(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "path/to/file.txt")), endpoint.Request.File);
       }
 
       [Test]
@@ -71,7 +71,7 @@ namespace unit {
       public void ShouldParseResponse_WithFile() {
          const string file = "../../YAML/response-file.yaml";
          var endpoint = YamlParser.FromFile(file)[0];
-         Assert.AreEqual(Path.GetFullPath(Path.Combine(file, "path/to/response/body")), endpoint.Response.File);
+         Assert.AreEqual(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "path/to/response/body")), endpoint.Response.File);
       }
 
       [Test]

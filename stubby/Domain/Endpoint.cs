@@ -4,20 +4,16 @@ namespace stubby.Domain {
 
    [DataContract]
    public class Endpoint {
-      private Request _request = new Request();
-      private Response _response = new Response();
-
-      [DataMember]
-      public Request Request {
-         get { return _request ?? (_request = new Request()); }
-         set { _request = value; }
+      public Endpoint() {
+         Request = new Request();
+         Response = new Response();
       }
 
       [DataMember]
-      public Response Response {
-         get { return _response ?? (_response = new Response()); }
-         set { _response = value; }
-      }
+      public Request Request { get; set; }
+
+      [DataMember]
+      public Response Response { get; set; }
 
       public override bool Equals(object o) {
          var other = (Endpoint) o;

@@ -65,7 +65,7 @@ namespace unit {
 
       [Test]
       public void Verify_Request_ShouldReturnError_WhenGivenANullRequest() {
-         var expected = new[] {"request is required."};
+         var expected = new List<string> {"request is required."};
          _endpoint.Request = null;
 
          var actual = EndpointContract.Verify(_endpoint);

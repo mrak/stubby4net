@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -7,7 +6,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using stubby.CLI;
-using stubby.Domain;
 
 namespace stubby.Portals {
 
@@ -52,6 +50,16 @@ namespace stubby.Portals {
                serializer.WriteObject(ms, entity);
                response.OutputStream.Write(ms.ToArray(), 0, (int) ms.Length);
             }
+      }
+
+      public static string ReadPost(HttpListenerRequest request) {
+         if (request.ContentLength64.Equals(0)) return null;
+
+         string post;
+         using (var reader = new StreamReader(request.InputStream)) {
+            post = reader.ReadToEnd();
+         }
+         return post;
       }
 
       public static string BuildUri(string location, uint port) {

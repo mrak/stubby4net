@@ -39,8 +39,7 @@ namespace stubby.CLI {
       private static IList<Endpoint> Parse(YamlStream yaml) {
          var yamlEndpoints = (YamlSequenceNode) yaml.Documents[0].RootNode;
 
-         return
-            (from YamlMappingNode yamlEndpoint in yamlEndpoints.Children select ParseEndpoint(yamlEndpoint)) as IList<Endpoint>;
+         return (from YamlMappingNode yamlEndpoint in yamlEndpoints select ParseEndpoint(yamlEndpoint)).ToList();
       }
 
       private static Endpoint ParseEndpoint(YamlMappingNode yamlEndpoint) {

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
 using stubby.Domain;
 
@@ -12,11 +10,9 @@ namespace stubby.Portals {
       private const string Name = "admin";
       private const string PingUrl = "/ping";
       private const string StatusUrl = "/status";
-      private const string PlainText = "text/plain";
       private const string Html = "text/html";
       private const string Root = "/";
       private const string AllowedMethods = "GET, HEAD, POST, PUT, DELETE";
-      private const string IdPattern = @"^\/([0-9]+)?$";
       private const string AcceptableUrls = @"^\/(ping|status|[0-9]*)$";
       private static readonly byte[] Pong = PortalUtils.GetBytes("pong");
       private readonly EndpointDb _endpointDb;
@@ -52,7 +48,6 @@ namespace stubby.Portals {
       public void Stop() {
          _listener.Stop();
       }
-
 
       private void ResponseHandler(HttpListenerContext context) {
          PortalUtils.PrintIncoming(Name, context.Request.Url.AbsolutePath, context.Request.HttpMethod);

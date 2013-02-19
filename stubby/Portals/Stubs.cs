@@ -58,12 +58,14 @@ namespace stubby.Portals {
       }
 
       private Endpoint FindEndpoint(HttpListenerContext context) {
+
          var incoming = new Endpoint {
             Request = {
                Url = context.Request.Url.AbsolutePath,
                Method = new List<string> {context.Request.HttpMethod},
                Headers = CreateDictionary(context.Request.Headers),
-               Query = CreateDictionary(context.Request.QueryString)
+               Query = CreateDictionary(context.Request.QueryString),
+               Post = PortalUtils.ReadPost(context.Request)
             }
          };
 

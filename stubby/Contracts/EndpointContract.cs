@@ -13,18 +13,18 @@ namespace stubby.Contracts {
       private static readonly ICollection<string> Methods = new[]
       {"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS", "HEAD"};
 
-      public static string[] Verify(Endpoint endpoint) {
-         return Verify(new[] {endpoint});
+      public static IList<string> Verify(Endpoint endpoint) {
+         return Verify(new List<Endpoint> {endpoint});
       }
 
-      public static string[] Verify(Endpoint[] endpoints) {
+      public static IList<string> Verify(IEnumerable<Endpoint> endpoints) {
          var errors = new List<string>();
 
          foreach (var endpoint in endpoints) {
             VerifyRequest(endpoint.Request, errors);
             VerifyResponse(endpoint.Response, errors);
          }
-         return errors.ToArray();
+         return errors;
       }
 
       private static void VerifyResponse(Response response, ICollection<string> errors) {
