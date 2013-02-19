@@ -10,7 +10,8 @@ namespace integration
       public void TestMethod1() {
          var args = new Arguments {
             Admin = 8889,
-            Stubs = 8882
+            Stubs = 8882,
+            Data = "../../YAML/e2e.yaml"
          };
          var stubby = new Stubby(args);
          stubby.Start();
