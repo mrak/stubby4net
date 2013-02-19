@@ -19,7 +19,7 @@ namespace stubby.CLI {
       [Option("w", "watch", HelpText = "Monitor supplied data file for changes and reload endpoints if necessary.")]
       public bool Watch { get; set; }
 
-      [Option("m", "mute", HelpText = "Monitor supplied data file for changes and reload endpoints if necessary.")]
+      [Option("m", "mute", HelpText = "Prevent stubby from logging to the console.")]
       public bool Mute { get; set; }
 
       [HelpOption]
