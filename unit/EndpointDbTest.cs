@@ -24,7 +24,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]
@@ -38,7 +38,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]
@@ -50,7 +50,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]
@@ -66,7 +66,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]
@@ -98,7 +98,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]
@@ -149,7 +149,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]
@@ -172,7 +172,7 @@ namespace unit {
 
          var actual = _endpointDb.Find(incoming);
 
-         Assert.AreSame(inserted, actual);
+         Assert.AreEqual(inserted, actual);
       }
 
       [Test]

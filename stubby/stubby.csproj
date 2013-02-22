@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -13,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
+  <UsingTask TaskName="MSBuild.ExtensionPack.Framework.ILMerge" AssemblyFile="C:\Program Files\MSBuild\ExtensionPack\4.0\MSBuild.ExtensionPack.dll" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -59,6 +59,7 @@
     <Compile Include="CLI\Program.cs" />
     <Compile Include="CLI\YamlParser.cs" />
     <Compile Include="Contracts\EndpointContract.cs" />
+    <Compile Include="Domain\ComparisonUtils.cs" />
     <Compile Include="Domain\Endpoint.cs" />
     <Compile Include="Domain\EndpointDb.cs" />
     <Compile Include="Domain\Request.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Exceptions\EndpointParsingException.cs" />
     <Compile Include="IArguments.cs" />
     <Compile Include="Portals\Admin.cs" />
+    <Compile Include="Portals\IPortal.cs" />
     <Compile Include="Portals\PortalUtils.cs" />
     <Compile Include="Portals\Stubs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,11 +79,20 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="C:\Program Files\MSBuild\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
+    <ItemGroup>
+      <Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\stubby.exe" />
+      <Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\*.dll" />
+      <!--<Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\CommandLine.dll"/>-->
+      <!--<Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\YamlDotNet.Core.dll"/>-->
+      <!--<Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\YamlDotNet.RepresentationModel.dll"/>-->
+    </ItemGroup>
+    <MSBuild.ExtensionPack.Framework.ILMerge TargetPlatformVersion="v4" TargetPlatformDirectory="$(MSBuildBinPath)" LogMessages="true" LogFile="$(MSBuildProjectDirectory)\bin\ILMerge.log" InputAssemblies="@(Input)" OutputFile="$(MSBuildProjectDirectory)\bin\stubby.exe" />
+  </Target>
 </Project>

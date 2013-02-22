@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Compare = stubby.Domain.ComparisonUtils;
 
 namespace stubby.Domain {
 
@@ -18,8 +19,17 @@ namespace stubby.Domain {
       [DataMember] public string Post { get; set; }
       [DataMember] public string File { get; set; }
 
-      public override bool Equals(object o) {
-         var other = (Request) o;
+      protected bool Equals(Request other) {
+         if (!string.Equals(Url, other.Url)) return false;
+         if (!string.Equals(Post, other.Post)) return false;
+         if (!string.Equals(File, other.File)) return false;
+         if (!Compare.Lists(Method, other.Method)) return false;
+         if (!Compare.Dictionaries(Headers, other.Headers)) return false;
+         if (!Compare.Dictionaries(Query, other.Query)) return false;
+         return true;
+      }
+
+      public bool Matches(Request other) {
          if (Url != other.Url) return false;
          if (!Method.Contains(other.Method[0])) return false;
 
@@ -40,6 +50,25 @@ namespace stubby.Domain {
 
          return true;
       }
+
+      public override int GetHashCode() {
+         unchecked {
+            var hashCode = (Url != null ? Url.GetHashCode() : 0);
+            hashCode = (hashCode*397) ^ (Method != null ? Method.GetHashCode() : 0);
+            hashCode = (hashCode*397) ^ (Headers != null ? Headers.GetHashCode() : 0);
+            hashCode = (hashCode*397) ^ (Query != null ? Query.GetHashCode() : 0);
+            hashCode = (hashCode*397) ^ (Post != null ? Post.GetHashCode() : 0);
+            hashCode = (hashCode*397) ^ (File != null ? File.GetHashCode() : 0);
+            return hashCode;
+         }
+      }
+
+      public override bool Equals(object obj) {
+         if (ReferenceEquals(null, obj)) return false;
+         if (ReferenceEquals(this, obj)) return true;
+         return obj.GetType() == GetType() && Equals((Request) obj);
+      }
+
    }
 
 }

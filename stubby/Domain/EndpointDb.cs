@@ -44,7 +44,7 @@ namespace stubby.Domain {
       }
 
       public Endpoint Find(Endpoint incoming) {
-         return (from stored in _dictionary where stored.Value.Equals(incoming) select stored.Value).FirstOrDefault();
+         return (from stored in _dictionary where stored.Value.Matches(incoming) select stored.Value).FirstOrDefault();
       }
 
       public Endpoint Fetch(uint id) {

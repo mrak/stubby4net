@@ -6,7 +6,7 @@ using stubby.Domain;
 
 namespace stubby.Portals {
 
-   internal class Admin : IDisposable {
+   internal class Admin : IPortal {
       private const string Name = "admin";
       private const string PingUrl = "/ping";
       private const string StatusUrl = "/status";

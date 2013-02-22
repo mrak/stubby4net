@@ -8,7 +8,7 @@ using stubby.Domain;
 
 namespace stubby.Portals {
 
-   internal class Stubs : IDisposable {
+   internal class Stubs : IPortal {
       private const string Name = "stubs";
       private const string UnregisteredEndoint = "is not a registered endpoint.";
       private readonly EndpointDb _endpointDb;
@@ -109,5 +109,4 @@ namespace stubby.Portals {
          _listener.BeginGetContext(AsyncHandler, _listener);
       }
    }
-
 }
