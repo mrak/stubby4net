@@ -14,15 +14,24 @@ namespace stubby.Portals {
       private const string ListeningString = "{0} portal listening at http://{1}:{2}";
       private const string IncomingArrow = "->";
       private const string OutgoingArrow = "<-";
-      private static readonly string Version =
-         FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
+      private const string JsonMimeType = "application/json";
+      private const string HtmlMimeType = "text/html";
 
-      public static void PrintIncoming(string portal, string url, string method, string message = "") {
-         Out.Incoming(string.Format(RequestResponseFormat, DateTime.Now.ToString("T"), IncomingArrow, method, portal,
-                                    url, message));
+      private static readonly string ServerHeader = "stubby4net/" +
+                                                    FileVersionInfo.GetVersionInfo(
+                                                       Assembly.GetExecutingAssembly().Location).ProductVersion;
+
+      public static void PrintIncoming(string portal, HttpListenerContext context, string message = "") {
+         var url = context.Request.Url.AbsolutePath;
+         var method = context.Request.HttpMethod;
+
+         Out.Incoming(string.Format(RequestResponseFormat,
+            DateTime.Now.ToString("T"), IncomingArrow, method, portal, url, message));
       }
 
-      public static void PrintOutgoing(string portal, string url, int status, string message = "") {
+      public static void PrintOutgoing(string portal, HttpListenerContext context, string message = "") {
+         var url = context.Request.Url.AbsolutePath;
+         var status = context.Response.StatusCode;
          var now = DateTime.Now.ToString("T");
          Action<string> function;
 
@@ -34,32 +43,36 @@ namespace stubby.Portals {
          function.Invoke(String.Format(RequestResponseFormat, now, OutgoingArrow, status, portal, url, message));
       }
 
-      public static void AddServerHeader(HttpListenerResponse response) {
-         response.AddHeader("Server", "stubby4net/" + Version);
+      public static void SetServerHeader(HttpListenerContext context) {
+         context.Response.Headers.Add(HttpResponseHeader.Server, ServerHeader);
       }
 
-      public static void AddJsonHeader(HttpListenerResponse response) {
-         response.Headers.Set("Content-Type", "application/json");
+      public static void SetJsonType(HttpListenerContext context) {
+         context.Response.Headers.Set(HttpRequestHeader.ContentType, JsonMimeType);
       }
 
-      public static void SerializeToJson<T>(T entity, HttpListenerResponse response) {
-            var serializer = new DataContractJsonSerializer(typeof (T));
-            AddJsonHeader(response);
+      public static void SetHtmlType(HttpListenerContext context) {
+         context.Response.Headers.Set(HttpRequestHeader.ContentType, HtmlMimeType);
+      }
 
-            using (var ms = new MemoryStream()) {
-               serializer.WriteObject(ms, entity);
-               response.OutputStream.Write(ms.ToArray(), 0, (int) ms.Length);
-            }
+      public static void SerializeToJson<T>(T entity, HttpListenerContext context) {
+         var serializer = new DataContractJsonSerializer(typeof (T));
+         SetJsonType(context);
+
+         serializer.WriteObject(context.Response.OutputStream, entity);
+      }
+
+      public static void WriteBody(HttpListenerContext context, string body) {
+         using (var writer = new StreamWriter(context.Response.OutputStream)) {
+            writer.Write(body);
+         }
       }
 
       public static string ReadPost(HttpListenerRequest request) {
          if (request.ContentLength64.Equals(0)) return null;
-
-         string post;
          using (var reader = new StreamReader(request.InputStream)) {
-            post = reader.ReadToEnd();
+            return reader.ReadToEnd();
          }
-         return post;
       }
 
       public static string BuildUri(string location, uint port) {
@@ -82,6 +95,18 @@ namespace stubby.Portals {
 
       public static void PrintListening(string name, string location, uint port) {
          Out.Status(string.Format(ListeningString, name, location, port));
+      }
+
+      public static void SetStatus(HttpListenerContext context, int status) {
+         context.Response.StatusCode = status;
+      }
+
+      public static void SetStatus(HttpListenerContext context, HttpStatusCode status) {
+         SetStatus(context, (int) status);
+      }
+
+      public static void AddLocationHeader(HttpListenerContext context, uint id) {
+         context.Response.Headers.Add(HttpResponseHeader.Location, "/" + id);
       }
    }
 

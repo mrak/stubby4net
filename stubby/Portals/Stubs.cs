@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using stubby.Domain;
+using utils = stubby.Portals.PortalUtils;
 
 namespace stubby.Portals {
 
@@ -30,31 +31,30 @@ namespace stubby.Portals {
       }
 
       public void Start(string location, uint port) {
-         _listener.Prefixes.Add(PortalUtils.BuildUri(location, port));
+         _listener.Prefixes.Add(utils.BuildUri(location, port));
          _listener.Start();
          _listener.BeginGetContext(AsyncHandler, _listener);
 
-         PortalUtils.PrintListening(Name, location, port);
+         utils.PrintListening(Name, location, port);
       }
 
       private void ResponseHandler(HttpListenerContext context) {
-         PortalUtils.PrintIncoming(Name, context.Request.Url.AbsolutePath, context.Request.HttpMethod);
-         PortalUtils.AddServerHeader(context.Response);
+         utils.PrintIncoming(Name, context);
+         utils.SetServerHeader(context);
 
          var found = FindEndpoint(context);
 
          if (found == null) {
             context.Response.StatusCode = (int) HttpStatusCode.NotFound;
             context.Response.Close();
-            PortalUtils.PrintOutgoing(Name, context.Request.Url.AbsolutePath, context.Response.StatusCode,
-                                      UnregisteredEndoint);
+            utils.PrintOutgoing(Name, context, UnregisteredEndoint);
             return;
          }
 
          context.Response.StatusCode = found.Response.Status;
          context.Response.Headers = CreateWebHeaderCollection(found.Response.Headers);
          WriteResponseBody(context.Response, found.Response);
-         PortalUtils.PrintOutgoing(Name, context.Request.Url.AbsolutePath, context.Response.StatusCode);
+         utils.PrintOutgoing(Name, context);
       }
 
       private Endpoint FindEndpoint(HttpListenerContext context) {
@@ -65,7 +65,7 @@ namespace stubby.Portals {
                Method = new List<string> {context.Request.HttpMethod},
                Headers = CreateDictionary(context.Request.Headers),
                Query = CreateDictionary(context.Request.QueryString),
-               Post = PortalUtils.ReadPost(context.Request)
+               Post = utils.ReadPost(context.Request)
             }
          };
 

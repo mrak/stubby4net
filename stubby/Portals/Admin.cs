@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using stubby.CLI;
 using stubby.Domain;
+using utils = stubby.Portals.PortalUtils;
 
 namespace stubby.Portals {
 
@@ -10,26 +13,42 @@ namespace stubby.Portals {
       private const string Name = "admin";
       private const string PingUrl = "/ping";
       private const string StatusUrl = "/status";
-      private const string Html = "text/html";
       private const string Root = "/";
-      private const string AllowedMethods = "GET, HEAD, POST, PUT, DELETE";
-      private const string AcceptableUrls = @"^\/(ping|status|[0-9]*)$";
-      private static readonly byte[] Pong = PortalUtils.GetBytes("pong");
+      private const string IdUrls = @"^\/[1-9][0-9]*$";
+      private const int UnprocessableEntity = 422;
+      private const string UnprocessableEntityMessage = "The request was well-formed but was unable to be followed due to semantic errors.";
+      private const string Pong = "pong";
       private readonly EndpointDb _endpointDb;
       private readonly HttpListener _listener;
-      private readonly IDictionary<string, Action<HttpListenerContext>> _methods;
+      private readonly IDictionary<string, Action<HttpListenerContext>> _idmethods;
+      private readonly IDictionary<string, Action<HttpListenerContext>> _rootmethods;
+      private readonly IDictionary<string, Action<HttpListenerContext>> _pingmethods;
+      private readonly IDictionary<string, Action<HttpListenerContext>> _statusmethods;
 
       public Admin(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {}
 
       public Admin(EndpointDb endpointDb, HttpListener listener) {
          _endpointDb = endpointDb;
          _listener = listener;
-         _methods = new Dictionary<string, Action<HttpListenerContext>> {
+         _pingmethods = new Dictionary<string, Action<HttpListenerContext>> {
+            {"GET", GoPing},
+            {"HEAD", GoPing}
+         };
+         _statusmethods = new Dictionary<string, Action<HttpListenerContext>> {
+            {"GET", GoStatus},
+            {"HEAD", GoStatus}
+         };
+         _idmethods = new Dictionary<string, Action<HttpListenerContext>> {
             {"GET", GoGet},
             {"HEAD", GoGet},
-            {"POST", GoPost},
-            {"PUT", GoPUT},
+            {"PUT", GoPut},
             {"DELETE", GoDelete}
+         };
+         _rootmethods = new Dictionary<string, Action<HttpListenerContext>> {
+            {"GET", GoGetAll},
+            {"HEAD", GoGetAll},
+            {"POST", GoPost},
+            {"DELETE", GoDeleteAll}
          };
       }
 
@@ -38,11 +57,11 @@ namespace stubby.Portals {
       }
 
       public void Start(string location, uint port) {
-         _listener.Prefixes.Add(PortalUtils.BuildUri(location, port));
+         _listener.Prefixes.Add(utils.BuildUri(location, port));
          _listener.Start();
          _listener.BeginGetContext(AsyncHandler, _listener);
 
-         PortalUtils.PrintListening(Name, location, port);
+         utils.PrintListening(Name, location, port);
       }
 
       public void Stop() {
@@ -50,73 +69,129 @@ namespace stubby.Portals {
       }
 
       private void ResponseHandler(HttpListenerContext context) {
-         PortalUtils.PrintIncoming(Name, context.Request.Url.AbsolutePath, context.Request.HttpMethod);
-         PortalUtils.AddServerHeader(context.Response);
+         var url = context.Request.Url.AbsolutePath;
+         IDictionary<string, Action<HttpListenerContext>> methods;
+         Action<HttpListenerContext> action;
 
-         if (!Regex.IsMatch(context.Request.Url.AbsolutePath, AcceptableUrls)) GoInvalid(context);
-         else if (_methods.ContainsKey(context.Request.HttpMethod)) _methods[context.Request.HttpMethod](context);
-         else GoInvalid(context);
+         if (url.Equals(PingUrl)) methods = _pingmethods;
+         else if (url.Equals(StatusUrl)) methods = _statusmethods;
+         else if (url.Equals(Root)) methods = _rootmethods;
+         else if (Regex.IsMatch(url, IdUrls)) methods = _idmethods;
+         else { utils.SetStatus(context, HttpStatusCode.NotFound); return; }
 
-         context.Response.Close();
-         PortalUtils.PrintOutgoing(Name, context.Request.Url.AbsolutePath, context.Response.StatusCode);
+         if (methods.TryGetValue(context.Request.HttpMethod, out action)) action(context);
+         else GoInvalid(context, methods.Keys);
+      }
+
+      private void GoGetAll(HttpListenerContext context) {
+         var all = _endpointDb.Fetch();
+         if (context.Request.HttpMethod.Equals("GET"))
+            utils.SerializeToJson(all, context);
       }
 
       private void GoGet(HttpListenerContext context) {
-         var url = context.Request.Url.AbsolutePath;
-
-         if (url.Equals(PingUrl)) {
-            GoPing(context);
-            return;
-         }
-
-         if (url.Equals(StatusUrl)) {
-            GoStatus(context);
-            return;
-         }
-
-         if (url.Equals(Root)) {
-            var all = _endpointDb.Fetch();
-            PortalUtils.SerializeToJson(all, context.Response);
-            return;
-         }
-
-         var id = uint.Parse(url.Substring(1));
+         var id = uint.Parse(context.Request.Url.AbsolutePath.Substring(1));
          var endpoint = _endpointDb.Fetch(id);
 
          if (endpoint == null) {
-            GoNotFound(context);
+            utils.SetStatus(context, HttpStatusCode.NotFound);
             return;
          }
 
-         if (context.Request.HttpMethod.Equals("GET")) PortalUtils.SerializeToJson(endpoint, context.Response);
+         if (context.Request.HttpMethod.Equals("GET")) utils.SerializeToJson(endpoint, context);
       }
 
-      private static void GoPost(HttpListenerContext context) {}
-      private static void GoPUT(HttpListenerContext context) {}
-      private static void GoDelete(HttpListenerContext context) {}
+      private void GoPost(HttpListenerContext context) {
+         var data = utils.ReadPost(context.Request);
+         IList<Endpoint> parsed;
 
-      private static void GoInvalid(HttpListenerContext context) {
-         context.Response.StatusCode = (int) HttpStatusCode.MethodNotAllowed;
-         context.Response.AddHeader("Allow", AllowedMethods);
+         try {
+            parsed = YamlParser.FromString(data);
+         } catch {
+            utils.SetStatus(context, HttpStatusCode.BadRequest);
+            return;
+         }
+
+         if (parsed.Count != 1) {
+            Unprocessable(context);
+            return;
+         }
+
+         uint id;
+         _endpointDb.Insert(parsed[0], out id);
+         utils.AddLocationHeader(context, id);
+         utils.SetStatus(context, HttpStatusCode.Created);
       }
 
-      private static void GoNotFound(HttpListenerContext context) {
-         context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+      private void GoPut(HttpListenerContext context) {
+         var id = uint.Parse(context.Request.Url.AbsolutePath.Substring(1));
+
+         if (_endpointDb.Fetch(id) == null) {
+            utils.SetStatus(context, HttpStatusCode.NotFound);
+            return;
+         }
+
+         var data = utils.ReadPost(context.Request);
+         IList<Endpoint> parsed;
+
+         try {
+            parsed = YamlParser.FromString(data);
+         } catch {
+            utils.SetStatus(context, HttpStatusCode.BadRequest);
+            return;
+         }
+
+         if (parsed.Count != 1) {
+            Unprocessable(context);
+            return;
+         }
+
+         _endpointDb.Replace(id, parsed[0]);
+      }
+
+      private void GoDeleteAll(HttpListenerContext context) {
+         _endpointDb.Delete();
+         utils.SetStatus(context, HttpStatusCode.NoContent);
+      }
+
+      private void GoDelete(HttpListenerContext context) {
+         var id = uint.Parse(context.Request.Url.AbsolutePath.Substring(1));
+
+         if (_endpointDb.Delete(id)) utils.SetStatus(context, HttpStatusCode.NoContent);
+         else utils.SetStatus(context, HttpStatusCode.NotFound);
+      }
+
+      private static void GoInvalid(HttpListenerContext context, IEnumerable<string> methods) {
+         utils.SetStatus(context, HttpStatusCode.MethodNotAllowed);
+         var allowedMethods = methods.Aggregate("", (current, method) => current + (" " + method)).Trim();
+         context.Response.Headers.Add(HttpResponseHeader.Allow, allowedMethods);
+      }
+
+      private static void Unprocessable(HttpListenerContext context) {
+         utils.SetStatus(context, UnprocessableEntity);
+         utils.WriteBody(context, UnprocessableEntityMessage);
       }
 
       private static void GoPing(HttpListenerContext context) {
-         context.Response.StatusCode = (int) HttpStatusCode.OK;
-         context.Response.OutputStream.Write(Pong, 0, Pong.Length);
+         utils.WriteBody(context, Pong);
       }
 
       private static void GoStatus(HttpListenerContext context) {
-         context.Response.StatusCode = (int) HttpStatusCode.OK;
-         context.Response.ContentType = Html;
+         utils.SetHtmlType(context);
       }
 
       private void AsyncHandler(IAsyncResult result) {
          var context = _listener.EndGetContext(result);
+
+         utils.PrintIncoming(Name, context);
+         utils.SetServerHeader(context);
+         utils.SetJsonType(context);
+
          ResponseHandler(context);
+
+         context.Response.Close();
+         utils.PrintOutgoing(Name, context);
+
          _listener.BeginGetContext(AsyncHandler, _listener);
       }
    }

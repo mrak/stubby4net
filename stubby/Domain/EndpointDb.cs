@@ -56,7 +56,7 @@ namespace stubby.Domain {
       public bool Replace(uint id, Endpoint endpoint) {
          if (!_dictionary.ContainsKey(id)) return false;
 
-         _dictionary[id] = endpoint;
+         _dictionary[id] = Defaults.Verify(endpoint);
          return true;
       }
 
