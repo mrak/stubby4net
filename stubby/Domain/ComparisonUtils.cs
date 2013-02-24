@@ -1,20 +1,26 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace stubby.Domain
 {
    internal class ComparisonUtils
    {
-      public static bool Dictionaries(IDictionary<string, string> left, IDictionary<string, string> right) {
-         foreach (var o in right) {
-            string retreived;
-            if (!left.TryGetValue(o.Key, out retreived)) return false;
-            if (!Equals(retreived, o.Value)) return false;
-         }
-         foreach (var o in left) {
-            string retreived;
-            if (!right.TryGetValue(o.Key, out retreived)) return false;
-            if (!Equals(retreived, o.Value)) return false;
+      public static bool NameValueCollections(NameValueCollection left, NameValueCollection right) {
+         if (left == null) return right == null;
+         if (right == null) return false;
+         if (left.Count != right.Count) return false;
+
+         foreach (var key in left.AllKeys) {
+            IList<string> leftValues = left.GetValues(key);
+            IList<string> rightValues = right.GetValues(key);
+
+            if (leftValues == null)
+               if (rightValues == null) continue;
+               else return false;
+            if (rightValues == null) return false;
+
+            if (!leftValues.All(rightValues.Contains) || !rightValues.All(leftValues.Contains)) return false;
          }
          return true;
       }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Runtime.Serialization;
 using Compare = stubby.Domain.ComparisonUtils;
 
@@ -8,14 +10,14 @@ namespace stubby.Domain {
    public class Request {
       public Request() {
          Method = new List<string> {"GET"};
-         Query = new Dictionary<string, string>();
-         Headers = new Dictionary<string, string>();
+         Query = new NameValueCollection();
+         Headers = new NameValueCollection();
       }
 
       [DataMember] public string Url { get; set; }
       [DataMember] public IList<string> Method { get; set; }
-      [DataMember] public IDictionary<string, string> Headers { get; set; }
-      [DataMember] public IDictionary<string, string> Query { get; set; }
+      [DataMember] public NameValueCollection Headers { get; set; }
+      [DataMember] public NameValueCollection Query { get; set; }
       [DataMember] public string Post { get; set; }
       [DataMember] public string File { get; set; }
 
@@ -24,8 +26,8 @@ namespace stubby.Domain {
          if (!string.Equals(Post, other.Post)) return false;
          if (!string.Equals(File, other.File)) return false;
          if (!Compare.Lists(Method, other.Method)) return false;
-         if (!Compare.Dictionaries(Headers, other.Headers)) return false;
-         if (!Compare.Dictionaries(Query, other.Query)) return false;
+         if (!Compare.NameValueCollections(Headers, other.Headers)) return false;
+         if (!Compare.NameValueCollections(Query, other.Query)) return false;
          return true;
       }
 
@@ -33,13 +35,16 @@ namespace stubby.Domain {
          if (Url != other.Url) return false;
          if (!Method.Contains(other.Method[0])) return false;
 
-         foreach (var header in Headers) {
-            if (!other.Headers.ContainsKey(header.Key)) return false;
-            if (other.Headers[header.Key] != header.Value) return false;
+         foreach (var header in Headers.AllKeys) {
+            IList<string> otherValues = other.Headers.GetValues(header);
+            if (otherValues == null) return false;
+            if (!Headers.GetValues(header).All(otherValues.Contains)) return false;
          }
-         foreach (var query in Query) {
-            if (!other.Query.ContainsKey(query.Key)) return false;
-            if (other.Query[query.Key] != query.Value) return false;
+
+         foreach (var variable in Query.AllKeys) {
+            IList<string> otherValues = other.Query.GetValues(variable);
+            if (otherValues == null) return false;
+            if (!Query.GetValues(variable).All(otherValues.Contains)) return false;
          }
 
          try {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using stubby.Domain;
 
@@ -16,8 +17,8 @@ namespace stubby.Contracts {
 
          return new Request {
             Url = VerifyUrl(request.Url),
-            Query = request.Query ?? new Dictionary<string, string>(),
-            Headers = request.Headers ?? new Dictionary<string, string>(),
+            Query = request.Query ?? new NameValueCollection(),
+            Headers = request.Headers ?? new NameValueCollection(),
             Post = request.Post,
             File = request.File,
             Method = VerifyMethod(request.Method)
@@ -49,7 +50,7 @@ namespace stubby.Contracts {
 
          return new Response {
             Status = VerifyStatus(response.Status),
-            Headers = response.Headers ?? new Dictionary<string, string>(),
+            Headers = response.Headers ?? new NameValueCollection(),
             Body = response.Body,
             Latency = response.Latency,
             File = response.File

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using NUnit.Framework;
 using stubby.Domain;
 
@@ -124,7 +125,7 @@ namespace unit {
                new Request {
                   Url = "/phantom",
                   Headers =
-                     new Dictionary<string, string> {
+                     new NameValueCollection {
                         {"Content-Type", "application/json"},
                         {"Content-Disposition", "attachment"},
                      }
@@ -137,7 +138,7 @@ namespace unit {
                   Method = new List<string> {"GET"},
                   Post = "A string!",
                   Headers =
-                     new Dictionary<string, string> {
+                     new NameValueCollection {
                         {"Content-Type", "application/json"},
                         {"Content-Disposition", "attachment"},
                         {"Server", "somethingSpecial"}
@@ -156,7 +157,7 @@ namespace unit {
       public void Find_ShouldRetrieveEndpoint_WhenQueriesMatch() {
          var inserted = new Endpoint {
             Request =
-               new Request {Url = "/phantom", Query = new Dictionary<string, string> {{"alpha", "a"}, {"beta", "b"},}}
+               new Request {Url = "/phantom", Query = new NameValueCollection {{"alpha", "a"}, {"beta", "b"},}}
          };
          var incoming = new Endpoint {
             Request =
@@ -164,7 +165,7 @@ namespace unit {
                   Url = "/phantom",
                   Method = new List<string> {"GET"},
                   Post = "A string!",
-                  Query = new Dictionary<string, string> {{"alpha", "a"}, {"beta", "b"}, {"kappa", "k"}}
+                  Query = new NameValueCollection {{"alpha", "a"}, {"beta", "b"}, {"kappa", "k"}}
                }
          };
 
@@ -194,7 +195,7 @@ namespace unit {
                new Request {
                   Url = "/phantom",
                   Headers =
-                     new Dictionary<string, string> {
+                     new NameValueCollection {
                         {"Content-Type", "application/json"},
                         {"Content-Disposition", "attachment"},
                      }
@@ -207,7 +208,7 @@ namespace unit {
                   Method = new List<string> {"GET"},
                   Post = "A string!",
                   Headers =
-                     new Dictionary<string, string> {
+                     new NameValueCollection {
                         {"Content-Type", "application/xml"},
                         {"Content-Disposition", "attachment"},
                         {"Server", "somethingSpecial"}
@@ -256,7 +257,7 @@ namespace unit {
       public void Find_ShouldReturnNull_WhenQueryDoesntMatch() {
          var inserted = new Endpoint {
             Request =
-               new Request {Url = "/phantom", Query = new Dictionary<string, string> {{"alpha", "a"}, {"beta", "b"},}}
+               new Request {Url = "/phantom", Query = new NameValueCollection {{"alpha", "a"}, {"beta", "b"},}}
          };
          var incoming = new Endpoint {
             Request =
@@ -264,7 +265,7 @@ namespace unit {
                   Url = "/phantom",
                   Method = new List<string> {"GET"},
                   Post = "A string!",
-                  Query = new Dictionary<string, string> {{"alpha", "c"}, {"beta", "b"}, {"kappa", "k"}}
+                  Query = new NameValueCollection {{"alpha", "c"}, {"beta", "b"}, {"kappa", "k"}}
                }
          };
 

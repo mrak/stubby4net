@@ -13,9 +13,13 @@
       url: /basic/delete
       method: DELETE
 
+-  request:
+      url: /basic/head
+      method: HEAD
+
 - request:
       url: /basic/all
-      method: [put, post, get, delete]
+      method: [put, post, delete, get, head]
 
 
 
@@ -48,6 +52,17 @@
          second: 'value2'
    response:
       status: 200
+      body: first query
+
+-  request:
+      url: /get/query
+      method: GET
+      query:
+         first: 'value1again'
+         second: 'value2again'
+   response:
+      status: 200
+      body: second query
 
 
 
@@ -62,6 +77,20 @@
       headers:
          location: /some/endpoint/id
       body: "resource has been created"
+
+-  request:
+      url: /post/auth/pair
+      method: POST
+      post: some=data
+      headers:
+         authorization: stubby:passwordZ0r
+   response:
+      status: 201
+      headers:
+         location: /some/endpoint/id
+      body: "resource has been created"
+
+
 
 -  request:
       url: /put/latency

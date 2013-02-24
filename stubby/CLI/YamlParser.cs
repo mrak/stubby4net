@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Net;
 using YamlDotNet.RepresentationModel;
 using stubby.Domain;
 
@@ -67,7 +69,7 @@ namespace stubby.CLI {
          foreach (var property in yamlRequest) {
             switch (property.Key.ToString()) {
                case "url": {
-                  request.Url = property.Value.ToString();
+                  request.Url = ParseString(property);
                   break;
                }
                case "method": {
@@ -75,19 +77,19 @@ namespace stubby.CLI {
                   break;
                }
                case "file": {
-                  request.File = ParseFile(property.Value.ToString());
+                  request.File = ParseFile(property);
                   break;
                }
                case "post": {
-                  request.Post = property.Value.ToString();
+                  request.Post = ParseString(property);
                   break;
                }
                case "query": {
-                  request.Query = ParseDictionary((YamlMappingNode) property.Value);
+                  request.Query = ParseCollection(property);
                   break;
                }
                case "headers": {
-                  request.Headers = ParseDictionary((YamlMappingNode) property.Value, true);
+                  request.Headers = ParseCollection(property, false);
                   break;
                }
             }
@@ -95,8 +97,12 @@ namespace stubby.CLI {
          return request;
       }
 
-      private static string ParseFile(string file) {
-         return Path.GetFullPath(Path.Combine(_fileDirectory, file));
+      private static string ParseString(KeyValuePair<YamlNode, YamlNode> property) {
+         return property.Value.ToString().TrimEnd(new[] {' ', '\t', '\n', '\r'});
+      }
+
+      private static string ParseFile(KeyValuePair<YamlNode, YamlNode> property) {
+         return Path.GetFullPath(Path.Combine(_fileDirectory, property.Value.ToString()));
       }
 
       private static List<string> ParseMethod(KeyValuePair<YamlNode, YamlNode> yamlMethod) {
@@ -121,7 +127,7 @@ namespace stubby.CLI {
                   break;
                }
                case "headers": {
-                  response.Headers = ParseDictionary((YamlMappingNode) property.Value, true);
+                  response.Headers = ParseCollection(property, false);
                   break;
                }
                case "latency": {
@@ -129,11 +135,11 @@ namespace stubby.CLI {
                   break;
                }
                case "body": {
-                  response.Body = property.Value.ToString();
+                  response.Body = ParseString(property);
                   break;
                }
                case "file": {
-                  response.File = ParseFile(property.Value.ToString());
+                  response.File = ParseFile(property);
                   break;
                }
             }
@@ -142,18 +148,18 @@ namespace stubby.CLI {
          return response;
       }
 
-      private static IDictionary<string, string> ParseDictionary(YamlMappingNode yamlMap, bool caseInsensitive = false) {
-         IDictionary<string, string> dictionary = new Dictionary<string, string>();
+      private static NameValueCollection ParseCollection(KeyValuePair<YamlNode, YamlNode> property, bool caseSensitive = true) {
+         var keyValuePairs = (YamlMappingNode) property.Value;
+         var collection = new NameValueCollection();
 
-         foreach (var property in yamlMap) {
-            var key = property.Key.ToString();
+         foreach (var keyValuePair in keyValuePairs) {
+            var key = keyValuePair.Key.ToString();
+            var value = keyValuePair.Value.ToString();
 
-            if (caseInsensitive) key = key.ToLower();
-
-            dictionary.Add(key, property.Value.ToString());
+            collection.Add(caseSensitive ? key : key.ToLower(), value);
          }
 
-         return dictionary;
+         return collection;
       }
    }
 

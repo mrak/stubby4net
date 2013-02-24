@@ -44,7 +44,7 @@ namespace stubby.Portals {
       }
 
       public static void SetServerHeader(HttpListenerContext context) {
-         context.Response.Headers.Add(HttpResponseHeader.Server, ServerHeader);
+         context.Response.AddHeader("Server", ServerHeader);
       }
 
       public static void SetJsonType(HttpListenerContext context) {

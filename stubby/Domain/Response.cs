@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Runtime.Serialization;
 using Compare = stubby.Domain.ComparisonUtils;
 
@@ -8,11 +9,11 @@ namespace stubby.Domain {
    public class Response {
       public Response() {
          Status = 200;
-         Headers = new Dictionary<string, string>();
+         Headers = new NameValueCollection();
       }
 
       [DataMember] public ushort Status { get; set; }
-      [DataMember] public IDictionary<string, string> Headers { get; set; }
+      [DataMember] public NameValueCollection Headers { get; set; }
       [DataMember] public ulong Latency { get; set; }
       [DataMember] public string Body { get; set; }
       [DataMember] public string File { get; set; }
@@ -22,7 +23,7 @@ namespace stubby.Domain {
          if (Latency != other.Latency) return false;
          if (!string.Equals(Body, other.Body)) return false;
          if (!string.Equals(File, other.File)) return false;
-         if (!Compare.Dictionaries(Headers, other.Headers)) return false;
+         if (!Compare.NameValueCollections(Headers, other.Headers)) return false;
          return true;
       }
 

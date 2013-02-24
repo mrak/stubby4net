@@ -11,7 +11,8 @@ namespace stubby.Portals {
 
    internal class Stubs : IPortal {
       private const string Name = "stubs";
-      private const string UnregisteredEndoint = "is not a registered endpoint.";
+      private const string UnregisteredEndoint = "is not a registered endpoint";
+      private const string UnexpectedError = "unexpectedtly generated a server error";
       private readonly EndpointDb _endpointDb;
       private readonly HttpListener _listener;
 
@@ -39,21 +40,17 @@ namespace stubby.Portals {
       }
 
       private void ResponseHandler(HttpListenerContext context) {
-         utils.PrintIncoming(Name, context);
-         utils.SetServerHeader(context);
-
          var found = FindEndpoint(context);
 
          if (found == null) {
             context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-            context.Response.Close();
             utils.PrintOutgoing(Name, context, UnregisteredEndoint);
             return;
          }
 
          context.Response.StatusCode = found.Response.Status;
-         context.Response.Headers = CreateWebHeaderCollection(found.Response.Headers);
-         WriteResponseBody(context.Response, found.Response);
+         context.Response.Headers.Add(found.Response.Headers);
+         WriteResponseBody(context, found.Response);
          utils.PrintOutgoing(Name, context);
       }
 
@@ -62,9 +59,9 @@ namespace stubby.Portals {
          var incoming = new Endpoint {
             Request = {
                Url = context.Request.Url.AbsolutePath,
-               Method = new List<string> {context.Request.HttpMethod},
-               Headers = CreateDictionary(context.Request.Headers),
-               Query = CreateDictionary(context.Request.QueryString),
+               Method = new List<string> {context.Request.HttpMethod.ToUpper()},
+               Headers = CreateNameValueCollection(context.Request.Headers, caseSensitiveKeys: false),
+               Query = CreateNameValueCollection(context.Request.QueryString),
                Post = utils.ReadPost(context.Request)
             }
          };
@@ -73,7 +70,7 @@ namespace stubby.Portals {
          return found;
       }
 
-      private static void WriteResponseBody(HttpListenerResponse response, Response found) {
+      private static void WriteResponseBody(HttpListenerContext context, Response found) {
          string body;
 
          try {
@@ -82,30 +79,33 @@ namespace stubby.Portals {
             body = found.Body;
          }
 
-         if (body == null) response.Close();
+         if (body != null) utils.WriteBody(context, body);
+      }
 
-         else {
-            var bytes = new byte[body.Length*sizeof (char)];
-            Buffer.BlockCopy(body.ToCharArray(), 0, bytes, 0, bytes.Length);
-            response.Close(bytes, false);
+      private static NameValueCollection CreateNameValueCollection(NameValueCollection collection, bool caseSensitiveKeys = true) {
+         var newCollection = new NameValueCollection();
+
+         foreach (var key in collection.AllKeys) {
+            newCollection.Add(caseSensitiveKeys ? key : key.ToLower(), collection.Get(key));
          }
-      }
 
-      private static IDictionary<string, string> CreateDictionary(NameValueCollection collection) {
-         return collection.AllKeys.ToDictionary(key => key, collection.Get);
-      }
-
-      private static WebHeaderCollection CreateWebHeaderCollection(IDictionary<string, string> headers) {
-         var collection = new WebHeaderCollection();
-
-         foreach (var header in headers) collection.Add(header.Key, header.Value);
-
-         return collection;
+         return newCollection;
       }
 
       private void AsyncHandler(IAsyncResult result) {
          var context = _listener.EndGetContext(result);
-         ResponseHandler(context);
+
+         utils.PrintIncoming(Name, context);
+         utils.SetServerHeader(context);
+
+         try {
+            ResponseHandler(context);
+         } catch {
+            utils.SetStatus(context, HttpStatusCode.InternalServerError);
+            utils.PrintOutgoing(Name, context, UnexpectedError);
+         }
+
+         context.Response.Close();
          _listener.BeginGetContext(AsyncHandler, _listener);
       }
    }
