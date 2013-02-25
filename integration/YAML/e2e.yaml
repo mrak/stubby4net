@@ -90,6 +90,18 @@
          location: /some/endpoint/id
       body: "resource has been created"
 
+-  request:
+      url: /post/auth/pair/extrabasic
+      method: POST
+      post: some=data
+      headers:
+         authorization: Basic stubby:passwordZ0r
+   response:
+      status: 201
+      headers:
+         location: /some/endpoint/id
+      body: "resource has been created"
+
 
 
 -  request:
@@ -121,7 +133,7 @@
 -  request:
       url: /file/post
       method: POST
-      file: spec/data/endpoints.file
+      file: endpoints.file
       post: post contents!
    response: {}
 

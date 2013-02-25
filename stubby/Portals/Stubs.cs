@@ -48,6 +48,8 @@ namespace stubby.Portals {
             return;
          }
 
+         if(found.Response.Latency > 0) System.Threading.Thread.Sleep((int) found.Response.Latency);
+
          context.Response.StatusCode = found.Response.Status;
          context.Response.Headers.Add(found.Response.Headers);
          WriteResponseBody(context, found.Response);

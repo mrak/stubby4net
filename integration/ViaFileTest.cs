@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using NUnit.Framework;
 using stubby;
 
@@ -189,5 +190,55 @@ namespace integration
          Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
          Assert.AreEqual(expectedBody, actualBody);
       }
+
+      [Test]
+      public void BasicAuthroization_IsConfigurableWith_ColonNotation() {
+         const string expectedBody = "resource has been created";
+         var request = WebRequest.Create("http://localhost:9992/post/auth/pair");
+         request.Method = "post";
+         request.Headers.Add(HttpRequestHeader.Authorization, TestUtils.EncodeBasicAuth("stubby", "passwordZ0r"));
+         TestUtils.WritePost(request, "some=data");
+
+         var response = (HttpWebResponse) request.GetResponse();
+         var actualBody = TestUtils.ExtractBody(response);
+         
+         Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+         Assert.AreEqual(expectedBody, actualBody);
+      }
+
+      [Test]
+      public void BasicAuthroization_IsConfigurableWith_ColonNotation_AndBasicExplicitlyDeclared() {
+         const string expectedBody = "resource has been created";
+         var request = WebRequest.Create("http://localhost:9992/post/auth/pair/extrabasic");
+         request.Method = "post";
+         request.Headers.Add(HttpRequestHeader.Authorization, TestUtils.EncodeBasicAuth("stubby", "passwordZ0r"));
+         TestUtils.WritePost(request, "some=data");
+
+         var response = (HttpWebResponse) request.GetResponse();
+         var actualBody = TestUtils.ExtractBody(response);
+         
+         Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+         Assert.AreEqual(expectedBody, actualBody);
+      }
+
+      [Test]
+      public void Latency_ShouldDelayResponse() {
+         var stopwatch = new Stopwatch();
+         const string expectedBody = "updated";
+         var request = WebRequest.Create("http://localhost:9992/put/latency");
+         request.Method = "put";
+         request.ContentLength = 0;
+
+         stopwatch.Start();
+         var response = (HttpWebResponse) request.GetResponse();
+         var actualBody = TestUtils.ExtractBody(response);
+         stopwatch.Stop();
+
+         Assert.IsTrue(stopwatch.ElapsedMilliseconds > 2000, "Responded too soon");
+         Assert.IsTrue(stopwatch.ElapsedMilliseconds < 2500, "Responded too late");
+         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+         Assert.AreEqual(expectedBody, actualBody);
+      }
+
    }
 }

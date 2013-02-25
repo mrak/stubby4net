@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Text;
 using YamlDotNet.RepresentationModel;
 using stubby.Domain;
 
@@ -155,6 +156,12 @@ namespace stubby.CLI {
          foreach (var keyValuePair in keyValuePairs) {
             var key = keyValuePair.Key.ToString();
             var value = keyValuePair.Value.ToString();
+
+            if (property.Key.ToString().Equals("headers") &&
+                key.Equals("authorization", StringComparison.InvariantCultureIgnoreCase) && value.Contains(":")) {
+               value = value.Replace("Basic ", "");
+               value = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
+            }
 
             collection.Add(caseSensitive ? key : key.ToLower(), value);
          }
