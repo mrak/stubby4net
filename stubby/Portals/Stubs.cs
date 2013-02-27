@@ -76,12 +76,12 @@ namespace stubby.Portals {
          string body;
 
          try {
-            body = File.ReadAllText(found.File);
+            body = File.ReadAllText(found.File).TrimEnd(new[] {' ', '\n', '\r', '\t'});;
          } catch {
             body = found.Body;
          }
 
-         if (body != null) utils.WriteBody(context, body);
+         utils.WriteBody(context, body);
       }
 
       private static NameValueCollection CreateNameValueCollection(NameValueCollection collection, bool caseSensitiveKeys = true) {

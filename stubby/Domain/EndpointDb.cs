@@ -7,10 +7,15 @@ using Defaults = stubby.Contracts.EndpointContract;
 namespace stubby.Domain {
 
    internal class EndpointDb {
-      private const string Loaded = "Loaded{0} {1}";
+      private const string Loaded = "Loaded {0} {1}";
       private readonly ConcurrentDictionary<uint, Endpoint> _dictionary = new ConcurrentDictionary<uint, Endpoint>();
       private readonly object _lock = new object();
       private uint _nextId;
+      public bool Notify { get; set; }
+
+      public EndpointDb() {
+         Notify = true;
+      }
 
       public bool Insert(Endpoint endpoint) {
          uint i;
@@ -23,8 +28,8 @@ namespace stubby.Domain {
 
          if (!_dictionary.TryAdd(id, verified)) return false;
 
-         var methods = verified.Request.Method.Aggregate("", (current, verb) => current + (" " + verb));
-         Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
+         var methods = verified.Request.Method.Aggregate("", (current, verb) => current + (verb + ",")).TrimEnd(',');
+         if(Notify) Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
          return true;
       }
 

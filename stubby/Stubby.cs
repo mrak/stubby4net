@@ -12,22 +12,27 @@ namespace stubby {
    public class Stubby : IDisposable {
       private readonly Admin _admin;
       private readonly IArguments _arguments;
-      private readonly EndpointDb _endpointDb;
+      private readonly EndpointDb _endpointDb = new EndpointDb();
       private readonly Stubs _stubs;
+      private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
 
       public Stubby(IArguments arguments) {
          _arguments = arguments ?? new Arguments {Mute = true};
-         _endpointDb = new EndpointDb();
          _admin = new Admin(_endpointDb);
          _stubs = new Stubs(_endpointDb);
+         _watcher.Path = Path.GetDirectoryName(_arguments.Data);
+         _watcher.Filter = Path.GetFileName(_arguments.Data);
+         _watcher.Changed += OnDatafileChange;
 
          Out.Mute = _arguments.Mute;
          LoadEndpoints();
+         _watcher.EnableRaisingEvents = _arguments.Watch;
       }
 
       public void Dispose() {
          _admin.Dispose();
          _stubs.Dispose();
+         _watcher.Dispose();
       }
 
       /// <summary>
@@ -125,6 +130,7 @@ namespace stubby {
             throw new EndpointParsingException("Could not parse endpoints due to YAML errors.", ex);
          }
 
+         _endpointDb.Delete();
          _endpointDb.Insert(endpoints);
       }
 
@@ -134,6 +140,17 @@ namespace stubby {
          _stubs.Start(_arguments.Location, _arguments.Stubs);
          Out.Linefeed();
       }
+
+      private void OnDatafileChange(object sender, FileSystemEventArgs e) {
+         if (e.ChangeType != WatcherChangeTypes.Changed) return;
+
+         _endpointDb.Notify = false;
+         LoadEndpoints();
+         _endpointDb.Notify = true;
+
+         Out.Notice(String.Format("'{0}' was changed. It has been reloaded.", _arguments.Data));
+      }
+
    }
 
 }

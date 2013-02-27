@@ -48,7 +48,7 @@ namespace stubby.Domain {
          }
 
          try {
-            return System.IO.File.ReadAllText(File) == other.Post;
+            return System.IO.File.ReadAllText(File).TrimEnd(' ', '\n', '\r', '\t') == other.Post;
          } catch {
             if (Post != null && Post != other.Post) return false;
          }

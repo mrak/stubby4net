@@ -240,5 +240,48 @@ namespace integration
          Assert.AreEqual(expectedBody, actualBody);
       }
 
+      [Test]
+      public void File_ShouldBeUsedAsResponse_WhenFound() {
+         const string expectedBody = "file contents!";
+         var request = WebRequest.Create("http://localhost:9992/file/body");
+
+         var response = (HttpWebResponse) request.GetResponse();
+         var actualBody = TestUtils.ExtractBody(response);
+
+         Assert.AreEqual(expectedBody, actualBody);
+      }
+
+      [Test]
+      public void Body_ShouldBeUsedAsResponse_WhenFileNotFound() {
+         const string expectedBody = "body contents!";
+         var request = WebRequest.Create("http://localhost:9992/file/body/missingfile");
+
+         var response = (HttpWebResponse) request.GetResponse();
+         var actualBody = TestUtils.ExtractBody(response);
+
+         Assert.AreEqual(expectedBody, actualBody);
+      }
+
+      [Test]
+      public void Post_ShouldBeMatchedFromFile_IfFileFound() {
+         var request = WebRequest.Create("http://localhost:9992/file/post");
+         request.Method = "post";
+         TestUtils.WritePost(request, "file contents!");
+
+         var response = (HttpWebResponse) request.GetResponse();
+         
+         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+      }
+
+      [Test]
+      public void Post_ShouldBeMatchedFromPost_IfFileNotFound() {
+         var request = WebRequest.Create("http://localhost:9992/file/post/missingfile");
+         request.Method = "post";
+         TestUtils.WritePost(request, "post contents!");
+
+         var response = (HttpWebResponse) request.GetResponse();
+         
+         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+      }
    }
 }

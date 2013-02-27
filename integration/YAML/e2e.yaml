@@ -135,11 +135,9 @@
       method: POST
       file: endpoints.file
       post: post contents!
-   response: {}
 
 -  request:
       url: /file/post/missingfile
       method: POST
       file: endpoints-nonexistant.file
       post: post contents!
-   response: {}
