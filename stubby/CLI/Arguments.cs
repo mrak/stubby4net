@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System;
+using CommandLine;
 using CommandLine.Text;
 
 namespace stubby.CLI {
@@ -22,11 +23,14 @@ namespace stubby.CLI {
       [Option("m", "mute", HelpText = "Prevent stubby from logging to the console.")]
       public bool Mute { get; set; }
 
+      [Option("v", "version", HelpText = "Print stubby's version number.")]
+      public bool Version { get; set; }
+
       [HelpOption]
       public string GetUsage() {
          var help = new HelpText {
-            Heading = new HeadingInfo("stubby", "1.0.0"),
-            Copyright = new CopyrightInfo("Eric Mrak", 2012),
+            Heading = new HeadingInfo("stubby", Stubby.Version),
+            Copyright = new CopyrightInfo("Eric Mrak", DateTime.Now.Year),
             AddDashesToOption = true
          };
          help.AddPreOptionsLine("Apache 2.0 License");

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using YamlDotNet.Core;
 using stubby.CLI;
 using stubby.Domain;
@@ -10,11 +12,12 @@ using stubby.Portals;
 namespace stubby {
 
    public class Stubby : IDisposable {
-      private readonly Admin _admin;
-      private readonly IArguments _arguments;
-      private readonly EndpointDb _endpointDb = new EndpointDb();
-      private readonly Stubs _stubs;
+      internal static readonly string Version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
       private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
+      private readonly EndpointDb _endpointDb = new EndpointDb();
+      private readonly IArguments _arguments;
+      private readonly Admin _admin;
+      private readonly Stubs _stubs;
 
       public Stubby(IArguments arguments) {
          _arguments = arguments ?? new Arguments {Mute = true};

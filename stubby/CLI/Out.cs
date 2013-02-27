@@ -13,8 +13,12 @@ namespace stubby.CLI {
          Console.ResetColor();
       }
 
+      public static void Log(string message) {
+         if (!Mute) Console.WriteLine(message);
+      }
+
       public static void Linefeed() {
-         if (!Mute) Console.WriteLine();
+         Log("");
       }
 
       public static void Warn(string message) {

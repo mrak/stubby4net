@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using stubby.CLI;
@@ -16,10 +14,7 @@ namespace stubby.Portals {
       private const string OutgoingArrow = "<-";
       private const string JsonMimeType = "application/json";
       private const string HtmlMimeType = "text/html";
-
-      private static readonly string ServerHeader = "stubby4net/" +
-                                                    FileVersionInfo.GetVersionInfo(
-                                                       Assembly.GetExecutingAssembly().Location).ProductVersion;
+      private static readonly string ServerHeader = "stubby4net/" + Stubby.Version;
 
       public static void PrintIncoming(string portal, HttpListenerContext context, string message = "") {
          var url = context.Request.Url.AbsolutePath;
