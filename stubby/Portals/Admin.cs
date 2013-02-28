@@ -9,7 +9,7 @@ using utils = stubby.Portals.PortalUtils;
 
 namespace stubby.Portals {
 
-   internal class Admin : IPortal {
+   internal class Admin : IDisposable {
       private const string Name = "admin";
       private const string PingUrl = "/ping";
       private const string StatusUrl = "/status";

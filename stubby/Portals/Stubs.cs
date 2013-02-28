@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Net;
 using stubby.Domain;
 using utils = stubby.Portals.PortalUtils;
 
 namespace stubby.Portals {
 
-   internal class Stubs : IPortal {
+   internal class Stubs : IDisposable {
       private const string Name = "stubs";
       private const string UnregisteredEndoint = "is not a registered endpoint";
       private const string UnexpectedError = "unexpectedtly generated a server error";
