@@ -34,7 +34,7 @@ namespace stubby.Portals {
          _listener.Prefixes.Add(utils.BuildUri(location, port));
          utils.PrintListening(Name, location, port);
 
-         if (utils.AddCertificateToStore(httpsPort)) {
+         if (Certificate.AddCertificateToStore(httpsPort)) {
             _listener.Prefixes.Add(utils.BuildUri(location, httpsPort, true));
             utils.PrintListening(Name, location, httpsPort);
          }
@@ -81,7 +81,7 @@ namespace stubby.Portals {
          string body;
 
          try {
-            body = File.ReadAllText(found.File).TrimEnd(new[] {' ', '\n', '\r', '\t'});;
+            body = File.ReadAllText(found.File).TrimEnd(new[] {' ', '\n', '\r', '\t'});
          } catch {
             body = found.Body;
          }

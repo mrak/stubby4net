@@ -10,15 +10,12 @@ using stubby.CLI;
 namespace stubby.Portals {
 
    internal static class PortalUtils {
-      private const string AuthenticationNeeded = "stubby needs elevated privileges to serve over https";
       private const string RequestResponseFormat = "[{0}] {1} {2} [{3}]{4} {5}";
       private const string ListeningString = "{0} portal listening at http{3}://{1}:{2}";
       private const string IncomingArrow = "->";
       private const string OutgoingArrow = "<-";
       private const string JsonMimeType = "application/json";
       private const string HtmlMimeType = "text/html";
-      private const string X509SubjectName = "CN=Eric Mrak, OU=4net, O=Stubby, C=US";
-      private const string NetshArgs = "http add sslcert ipport=0.0.0.0:{0} certhash={1} appid='{2}' clientcertnegotiation=enable";
       private static readonly string ServerHeader = "stubby4net/" + Stubby.Version;
 
       public static void PrintIncoming(string portal, HttpListenerContext context, string message = "") {
@@ -75,37 +72,6 @@ namespace stubby.Portals {
          }
       }
 
-      public static bool AddCertificateToStore(uint httpsPort) {
-         var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-
-         try {
-            store.Open(OpenFlags.ReadWrite);
-         } catch {
-            Out.Error(AuthenticationNeeded);
-            return false;
-         }
-
-         var cert = new X509Certificate2(
-            Certificate.CreateSelfSignCertificatePfx(X509SubjectName, DateTime.Now.AddDays(-1), DateTime.Now.AddYears(1), "stubby"),
-            "stubby",
-            X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
-         cert.FriendlyName = "Stubby4net Certificate";
-
-         var existingCerts = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, cert.Subject, false);
-         if (existingCerts.Count == 0) store.Add(cert);
-         else cert = existingCerts[0];
-         store.Close();
-
-         var args = String.Format(NetshArgs, httpsPort, cert.GetCertHashString(), "{"+Stubby.Guid+"}");
-         var process = new ProcessStartInfo("netsh", args) {
-            Verb = "runas",
-            CreateNoWindow = true,
-            WindowStyle = ProcessWindowStyle.Hidden,
-            UseShellExecute = true
-         };
-         Process.Start(process).WaitForExit();
-         return true;
-      }
 
       public static string BuildUri(string location, uint port, bool https = false) {
          var stringBuilder = new StringBuilder("");
