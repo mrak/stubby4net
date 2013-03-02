@@ -11,6 +11,9 @@ namespace stubby.CLI {
       [Option("s", "stubs", DefaultValue = (uint) 8882, HelpText = "Port for stubs portal. Defaults to 8882.")]
       public uint Stubs { get; set; }
 
+      [Option("t", "tls", DefaultValue = (uint) 7443, HelpText = "Port for https stubs portal. Defaults to 7443.")]
+      public uint Tls { get; set; }
+
       [Option("l", "location", DefaultValue = "localhost", HelpText = "Hostname at which to bind stubby.")]
       public string Location { get; set; }
 

@@ -10,6 +10,10 @@
       ///</summary>
       public uint Stubs { get; set; }
       ///<summary>
+      /// Port for stubs https portal. Defaults to 7443.
+      ///</summary>
+      public uint Tls { get; set; }
+      ///<summary>
       /// Hostname at which to bind stubby. Defaults to localhost.
       ///</summary>
       public string Location { get; set; }
@@ -29,6 +33,7 @@
       public Arguments() {
          Admin = 8889;
          Stubs = 8882;
+         Tls = 7443;
          Location = "localhost";
          Data = null;
          Mute = true;

@@ -12,6 +12,7 @@ using stubby.Portals;
 namespace stubby {
 
    public class Stubby : IDisposable {
+      internal static readonly Guid Guid = Assembly.GetExecutingAssembly().GetType().GUID;
       internal static readonly string Version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
       private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
       private readonly EndpointDb _endpointDb = new EndpointDb();
@@ -140,9 +141,10 @@ namespace stubby {
       private void StartPortals() {
          Out.Linefeed();
          _admin.Start(_arguments.Location, _arguments.Admin);
-         _stubs.Start(_arguments.Location, _arguments.Stubs);
+         _stubs.Start(_arguments.Location, _arguments.Stubs, _arguments.Tls);
          Out.Linefeed();
       }
+
 
       private void OnDatafileChange(object sender, FileSystemEventArgs e) {
          if (e.ChangeType != WatcherChangeTypes.Changed) return;

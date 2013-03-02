@@ -68,6 +68,7 @@
     <Compile Include="Exceptions\EndpointParsingException.cs" />
     <Compile Include="IArguments.cs" />
     <Compile Include="Portals\Admin.cs" />
+    <Compile Include="Portals\Certificate.cs" />
     <Compile Include="Portals\PortalUtils.cs" />
     <Compile Include="Portals\Stubs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
