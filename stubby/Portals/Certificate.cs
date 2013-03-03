@@ -44,7 +44,13 @@ namespace stubby.Portals {
             WindowStyle = ProcessWindowStyle.Hidden,
             UseShellExecute = true
          };
-         Process.Start(netsh).WaitForExit();
+
+         try {
+            var process = Process.Start(netsh);
+            process.WaitForExit();
+            Console.Out.WriteLine(process.ExitCode);
+            if(process.ExitCode == 0) return true;
+         } catch {} 
 
          var httpcfgArgs = String.Format(HttpcfgArgs, httpsPort, cert.GetCertHashString());
          var httpcfg = new ProcessStartInfo("httpcfg", httpcfgArgs) {
@@ -53,9 +59,14 @@ namespace stubby.Portals {
             WindowStyle = ProcessWindowStyle.Hidden,
             UseShellExecute = true
          };
-         Process.Start(httpcfg).WaitForExit();
 
-         return true;
+         try {
+            var process = Process.Start(httpcfg);
+            process.WaitForExit();
+            return process.ExitCode == 0;
+         } catch {
+            return false;
+         }
       }
 
       public static byte[] CreateSelfSignCertificatePfx(string x500, DateTime startTime, DateTime endTime) {

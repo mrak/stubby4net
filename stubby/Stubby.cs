@@ -24,12 +24,14 @@ namespace stubby {
          _arguments = arguments ?? new Arguments {Mute = true};
          _admin = new Admin(_endpointDb);
          _stubs = new Stubs(_endpointDb);
-         _watcher.Path = Path.GetDirectoryName(_arguments.Data);
-         _watcher.Filter = Path.GetFileName(_arguments.Data);
-         _watcher.Changed += OnDatafileChange;
 
          Out.Mute = _arguments.Mute;
          LoadEndpoints();
+         if (!_arguments.Watch) return;
+
+         _watcher.Path = Path.GetDirectoryName(_arguments.Data);
+         _watcher.Filter = Path.GetFileName(_arguments.Data);
+         _watcher.Changed += OnDatafileChange;
          _watcher.EnableRaisingEvents = _arguments.Watch;
       }
 

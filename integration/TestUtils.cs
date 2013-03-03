@@ -23,7 +23,7 @@ namespace integration
 
          try {
             encoding = Encoding.GetEncoding(response.CharacterSet);
-         } catch (ArgumentException ex) {
+         } catch (ArgumentException) {
             encoding = Encoding.Default;
          }
 

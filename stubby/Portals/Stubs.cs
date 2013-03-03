@@ -32,16 +32,13 @@ namespace stubby.Portals {
 
       public void Start(string location, uint port, uint httpsPort) {
          _listener.Prefixes.Add(utils.BuildUri(location, port));
-         utils.PrintListening(Name, location, port);
-
-         if (Certificate.AddCertificateToStore(httpsPort)) {
-            _listener.Prefixes.Add(utils.BuildUri(location, httpsPort, true));
-            utils.PrintListening(Name, location, httpsPort);
-         }
+         _listener.Prefixes.Add(utils.BuildUri(location, httpsPort, true));
 
          _listener.Start();
          _listener.BeginGetContext(AsyncHandler, _listener);
 
+         utils.PrintListening(Name, location, port);
+         utils.PrintListening(Name, location, httpsPort);
       }
 
       private void ResponseHandler(HttpListenerContext context) {
