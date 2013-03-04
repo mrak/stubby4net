@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>http://github.com/mrak/stubby4net</projectUrl>
+    <licenseUrl>https://raw.github.com/mrak/stubby4net/master/LICENSE.txt</licenseUrl>
+    <iconUrl>http://stub.by/favicon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release of stubby4net</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <tags>stub mock testing server</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+</package>
