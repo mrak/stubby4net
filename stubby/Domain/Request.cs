@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using Compare = stubby.Domain.ComparisonUtils;
 
 namespace stubby.Domain {
@@ -32,7 +33,7 @@ namespace stubby.Domain {
       }
 
       public bool Matches(Request other) {
-         if (Url != other.Url) return false;
+         if (!Regex.IsMatch(other.Url, Url)) return false;
          if (!Method.Contains(other.Method[0])) return false;
 
          foreach (var header in Headers.AllKeys) {

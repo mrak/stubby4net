@@ -55,6 +55,23 @@ namespace unit {
       }
 
       [Test]
+      public void Find_ShouldRetrieveEndpoint_WhenUrlIsARegexMatchOnIncomingRequest() {
+         var inserted = new Endpoint
+         {
+            Request = new Request { Url = "/phantom$", Method = new List<string> {"POST"}}
+         };
+         var incoming = new Endpoint {
+            Request = new Request { Url = "/ghost/or/phantom", Method = new List<string> { "POST" }}
+         };
+
+         _endpointDb.Insert(inserted);
+
+         var actual = _endpointDb.Find(incoming);
+
+         Assert.AreEqual(inserted, actual);
+      }
+
+      [Test]
       public void Find_ShouldRetrieveEndpoint_WhenFileMatchesIncomingPost() {
          var inserted = new Endpoint {
             Request = new Request {Url = "/phantom", File = "../../Files/someFileContents.txt"}
