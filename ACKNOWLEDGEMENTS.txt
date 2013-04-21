@@ -1,0 +1,13 @@
+Bundled dependencies and their licenses:
+
+title:   CommandLineParser
+author:  Giacomo Stelluti Scala
+url:     https://github.com/gsscoder/commandline
+license: MIT license
+use:     Parsing command-line options for stubby
+
+title:   YamlDotNet
+author:  Antoine Aubry
+url:     https://github.com/aaubry/YamlDotNet
+license: MIT license
+use:     Parsing YAML data files
