@@ -486,8 +486,8 @@ Add `stubby` as a module within your project:
 
 ## See Also
 
-**[stubby4node](https://github.com/mrak/stubby4node):** A node.js implementation of stubby
-**[stubby4j](https://github.com/azagniotov/stubby4j):** A java implementation of stubby
+* **[stubby4node](https://github.com/mrak/stubby4node):** A node.js implementation of stubby
+* **[stubby4j](https://github.com/azagniotov/stubby4j):** A java implementation of stubby
 
 ## TODO
 
