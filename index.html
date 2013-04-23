@@ -1,0 +1,594 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Stubby4net by mrak</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Stubby4net</h1>
+        <p>A small configurable server for stubbing external systems during development.</p>
+
+        <p class="view"><a href="https://github.com/mrak/stubby4net">View the Project on GitHub <small>mrak/stubby4net</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/mrak/stubby4net/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mrak/stubby4net/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mrak/stubby4net">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>stubby4net</h1>
+
+<h2>Table of Contents</h2>
+
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#starting-the-servers">Starting the Server(s)</a></li>
+<li><a href="#command-line-switches">Command-line Switches</a></li>
+<li><a href="#endpoint-configuration">Endpoint Configuration</a></li>
+<li><a href="#the-admin-portal">The Admin Portal</a></li>
+<li><a href="#the-stubs-portal">The Stubs Portal</a></li>
+<li><a href="#programmatic-api">Programmatic API</a></li>
+<li><a href="#running-tests">Running Tests</a></li>
+<li><a href="#see-also">See Also</a></li>
+<li><a href="#todo">TODO</a></li>
+<li><a href="#wishful-thinkings">Wishful Thinkings</a></li>
+<li><a href="#notes">NOTES</a></li>
+</ul><h2>Installation</h2>
+
+<h3>As a command-line tool via <a href="http://chocolatey.org/">Chocolatey</a>
+</h3>
+
+<pre><code>cinst stubby
+</code></pre>
+
+<p>This will install <code>stubby</code> as a command in your <code>PATH</code>.</p>
+
+<h3>As a project dependency via <a href="http://nuget.org/">NuGet</a>
+</h3>
+
+<pre><code>PM&gt; Install-Package stubby
+</code></pre>
+
+<h2>Requirements</h2>
+
+<ul>
+<li>.NET Framework 4+</li>
+</ul><p>Testing with Mono has not been explicitly performed but adherence to Mono-compatible APIs was attempted.</p>
+
+<h3>Packaged</h3>
+
+<ul>
+<li>
+<a href="https://github.com/aaubry/YamlDotNet">YamlDotNet</a> for loading yaml files.</li>
+<li>
+<a href="https://github.com/gsscoder/commandline">CommandLineParser</a> for handling cli arguments.</li>
+</ul><h3>Optional (for development)</h3>
+
+<ul>
+<li><a href="http://nunit.org">NUnit</a></li>
+</ul><h2>Starting the Server(s)</h2>
+
+<p>Some systems require you to <code>sudo</code> before running services on port certain ports (like 80)</p>
+
+<pre><code>[sudo] stubby
+</code></pre>
+
+<h2>Command-line Switches</h2>
+
+<pre><code>stubby [-a &lt;port&gt;] [-s &lt;port&gt;] [-t &lt;port&gt;]
+       [-l &lt;hostname&gt;] [-d &lt;file&gt;] [-v] [-w] [-m]
+
+-a, --admin &lt;port&gt;          Port for admin portal. Defaults to 8889.
+-s, --stubs &lt;port&gt;          Port for stubs portal. Defaults to 8882.
+-t, --tls &lt;port&gt;            Port for https stubs portal. Defaults to 7443.
+-l, --location &lt;hostname&gt;   Hostname at which to bind stubby.
+-d, --data &lt;file&gt;           Data file to pre-load endoints. YAML or JSON format.
+-w, --watch                 Auto-reload data file when edits are made.
+-m, --mute                  Prevent stubby from printing to the console.
+-v, --version               Prints stubby's version number.
+--help                      This help text.
+</code></pre>
+
+<h2>Endpoint Configuration</h2>
+
+<p>This section explains the usage, intent and behavior of each property on the <code>request</code> and <code>response</code> objects.</p>
+
+<p>Here is a fully-populated, unrealistic endpoint:</p>
+
+<div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/your/awesome/endpoint$</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">POST</span>
+      <span class="l-Scalar-Plain">query</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">exclamation</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">post requests can have query strings!</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">content-type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/xml</span>
+      <span class="l-Scalar-Plain">post</span><span class="p-Indicator">:</span> <span class="p-Indicator">&gt;</span>
+         <span class="no">&lt;!xml blah="blah blah blah"&gt;</span>
+         <span class="no">&lt;envelope&gt;</span>
+            <span class="no">&lt;unaryTag/&gt;</span>
+         <span class="no">&lt;/envelope&gt;</span>
+      <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">tryMyFirst.xml</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">status</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">200</span>
+      <span class="l-Scalar-Plain">latency</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">5000</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">content-type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/xml</span>
+         <span class="l-Scalar-Plain">server</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">stubbedServer/4.2</span>
+      <span class="l-Scalar-Plain">body</span><span class="p-Indicator">:</span> <span class="p-Indicator">&gt;</span>
+         <span class="no">&lt;!xml blah="blah blah blah"&gt;</span>
+         <span class="no">&lt;responseXML&gt;</span>
+            <span class="no">&lt;content&gt;&lt;/content&gt;</span>
+         <span class="no">&lt;/responseXML&gt;</span>
+      <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">responseData.xml</span>
+</pre></div>
+
+<h3>request</h3>
+
+<p>This object is used to match an incoming request to stubby against the available endpoints that have been configured.</p>
+
+<h4>url (required)</h4>
+
+<ul>
+<li>is a full-fledged <strong>regular expression</strong>
+</li>
+<li>This is the only required property of an endpoint.</li>
+<li>signify the url after the base host and port (i.e. after <code>localhost:8882</code>).</li>
+<li>must begin with <code>/</code>.</li>
+<li>any query paramters are stripped (so don't include them, that's what <code>query</code> is for).
+
+<ul>
+<li>
+<code>/url?some=value&amp;another=value</code> becomes <code>/url</code>
+</li>
+</ul>
+</li>
+<li>no checking is done for URI-encoding compliance.
+
+<ul>
+<li>If it's invalid, it won't ever trigger a match.</li>
+</ul>
+</li>
+</ul><p>This is the simplest you can get:</p>
+
+<div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/</span>
+</pre></div>
+
+<p>A demonstration using regular expressions:</p>
+
+<div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/has/to/begin/with/this/</span>
+
+<span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/has/to/end/with/this/$</span>
+
+<span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/must/be/this/exactly/with/optional/trailing/slash/?$</span>
+</pre></div>
+
+<h4>method</h4>
+
+<ul>
+<li>defaults to <code>GET</code>.</li>
+<li>case-insensitive.</li>
+<li>can be any of the following:
+
+<ul>
+<li>HEAD</li>
+<li>GET</li>
+<li>POST</li>
+<li>PUT</li>
+<li>POST</li>
+<li>DELETE</li>
+<li>etc.</li>
+</ul>
+</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/anything</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">GET</span>
+</pre></div>
+
+<ul>
+<li>it can also be an array of values.</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/anything</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">GET</span><span class="p-Indicator">,</span> <span class="nv">HEAD</span><span class="p-Indicator">]</span>
+
+<span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/yonder</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span>
+         <span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">GET</span>
+         <span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">HEAD</span>
+         <span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">POST</span>
+</pre></div>
+
+<h4>query</h4>
+
+<ul>
+<li>if ommitted, stubby ignores query parameters for the given url.</li>
+<li>a yaml hashmap of variable/value pairs.</li>
+<li><p>allows the query parameters to appear in any order in a uri</p></li>
+<li>
+<p>The following will match either of these:</p>
+
+<ul>
+<li><code>/with/parameters?search=search+terms&amp;filter=month</code></li>
+<li><code>/with/parameters?filter=month&amp;search=search+terms</code></li>
+</ul>
+</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/with/parameters$</span>
+      <span class="l-Scalar-Plain">query</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">search</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">search terms</span>
+         <span class="l-Scalar-Plain">filter</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">month</span>
+</pre></div>
+
+<h4>post</h4>
+
+<ul>
+<li>if ommitted, any post data is ignored.</li>
+<li>the body contents of the server request, such as form data.</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/post/form/data$</span>
+      <span class="l-Scalar-Plain">post</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">name=John&amp;email=john@example.com</span>
+</pre></div>
+
+<h4>file</h4>
+
+<ul>
+<li>if supplied, replaces <code>post</code> with the contents of the locally given file.
+
+<ul>
+<li>paths are relative from where stubby was executed.</li>
+</ul>
+</li>
+<li>if the file is not found when the request is made, falls back to <code>post</code> for matching.</li>
+<li>allows you to split up stubby data across multiple files</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/match/against/file$</span>
+      <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">postedData.json</span>
+      <span class="l-Scalar-Plain">post</span><span class="p-Indicator">:</span> <span class="s">'{"fallback":"data"}'</span>
+</pre></div>
+
+<p>postedData.json</p>
+
+<div class="highlight"><pre><span class="p">{</span><span class="nt">"fileContents"</span><span class="p">:</span><span class="s2">"match against this if the file is here"</span><span class="p">}</span>
+</pre></div>
+
+<ul>
+<li>if <code>postedData.json</code> doesn't exist on the filesystem when <code>/match/against/file</code> is requested, stubby will match post contents against <code>{"fallback":"data"}</code> (from <code>post</code>) instead.</li>
+</ul><h4>headers</h4>
+
+<ul>
+<li>if ommitted, stubby ignores headers for the given url.</li>
+<li>case-insensitive matching of header names.</li>
+<li>a hashmap of header/value pairs similar to <code>query</code>.</li>
+</ul><p>The following endpoint only accepts requests with <code>application/json</code> post values:</p>
+
+<div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/post/json</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">post</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">content-type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+</pre></div>
+
+<h3>response</h3>
+
+<p>Assuming a match has been made against the given <code>request</code> object, data from <code>response</code> is used to build the stubbed response back to the client.</p>
+
+<h4>status</h4>
+
+<ul>
+<li>the HTTP status code of the response.</li>
+<li>integer or integer-like string.</li>
+<li>defaults to <code>200</code>.</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/im/a/teapot$</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">POST</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">status</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">420</span>
+</pre></div>
+
+<h4>body</h4>
+
+<ul>
+<li>contents of the response body</li>
+<li>defaults to an empty content body</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/give/me/a/smile$</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">body</span><span class="p-Indicator">:</span> <span class="s">':)'</span>
+</pre></div>
+
+<h4>file</h4>
+
+<ul>
+<li>similar to <code>request.file</code>, but the contents of the file are used as the <code>body</code>.</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">extremelyLongJsonFile.json</span>
+</pre></div>
+
+<h4>headers</h4>
+
+<ul>
+<li>similar to <code>request.headers</code> except that these are sent back to the client.</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/give/me/some/json$</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">content-type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+      <span class="l-Scalar-Plain">body</span><span class="p-Indicator">:</span> <span class="p-Indicator">&gt;</span>
+         <span class="no">[{</span>
+            <span class="no">"name":"John",</span>
+            <span class="no">"email":"john@example.com"</span>
+         <span class="no">},{</span>
+            <span class="no">"name":"Jane",</span>
+            <span class="no">"email":"jane@example.com"</span>
+         <span class="no">}]</span>
+</pre></div>
+
+<h4>latency</h4>
+
+<ul>
+<li>time to wait, in milliseconds, before sending back the response</li>
+<li>good for testing timeouts, or slow connections</li>
+</ul><div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/hello/to/jupiter$</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">latency</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">800000</span>
+      <span class="l-Scalar-Plain">body</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Hello, World!</span>
+</pre></div>
+
+<h2>The Admin Portal</h2>
+
+<p>The admin portal is a RESTful(ish) endpoint running on <code>localhost:8889</code>. Or wherever you described through stubby's options.</p>
+
+<h3>Supplying Endpoints to Stubby</h3>
+
+<p>Submit <code>POST</code> requests to <code>localhost:8889</code> or load a data-file (-d) with the following structure for each endpoint:</p>
+
+<ul>
+<li>
+<code>request</code>: describes the client's call to the server
+
+<ul>
+<li>
+<code>method</code>: GET/POST/PUT/DELETE/etc.</li>
+<li>
+<code>url</code>: the URI regex string. GET parameters should also be included inline here</li>
+<li>
+<code>query</code>: a key/value map of query string parameters included with the request</li>
+<li>
+<code>headers</code>: a key/value map of headers the server should respond to</li>
+<li>
+<code>post</code>: a string matching the textual body of the response.</li>
+<li>
+<code>file</code>: if specified, returns the contents of the given file as the request post. If the file cannot be found at request time, <strong>post</strong> is used instead</li>
+</ul>
+</li>
+<li>
+<code>response</code>: describes the server's response to the client
+
+<ul>
+<li>
+<code>headers</code>: a key/value map of headers the server should use in it's response</li>
+<li>
+<code>latency</code>: the time in milliseconds the server should wait before responding. Useful for testing timeouts and latency</li>
+<li>
+<code>file</code>: if specified, returns the contents of the given file as the response body. If the file cannot be found at request time, <strong>body</strong> is used instead</li>
+<li>
+<code>body</code>: the textual body of the server's response to the client</li>
+<li>
+<code>status</code>: the numerical HTTP status code (200 for OK, 404 for NOT FOUND, etc.)</li>
+</ul>
+</li>
+</ul><h4>YAML (file only)</h4>
+
+<div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/path/to/something$</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">POST</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">authorization</span><span class="p-Indicator">:</span> <span class="s">"Basic</span><span class="nv"> </span><span class="s">usernamez:passwordinBase64"</span>
+      <span class="l-Scalar-Plain">post</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">this is some post data in textual format</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">Content-Type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+      <span class="l-Scalar-Plain">latency</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1000</span>
+      <span class="l-Scalar-Plain">status</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">200</span>
+      <span class="l-Scalar-Plain">body</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">You're request was successfully processed!</span>
+
+<span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/path/to/anotherThing</span>
+      <span class="l-Scalar-Plain">query</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">a</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">anything</span>
+         <span class="l-Scalar-Plain">b</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">more</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">GET</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">Content-Type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+      <span class="l-Scalar-Plain">post</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">Content-Type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+         <span class="l-Scalar-Plain">Access-Control-Allow-Origin</span><span class="p-Indicator">:</span> <span class="s">"*"</span>
+      <span class="l-Scalar-Plain">status</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">204</span>
+      <span class="l-Scalar-Plain">file</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">path/to/page.html</span>
+
+<span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">^/path/to/thing$</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">POST</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">Content-Type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+      <span class="l-Scalar-Plain">post</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">this is some post data in textual format</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">headers</span><span class="p-Indicator">:</span>
+         <span class="l-Scalar-Plain">Content-Type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">application/json</span>
+      <span class="l-Scalar-Plain">status</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">304</span>
+</pre></div>
+
+<h4>JSON (file or POST/PUT)</h4>
+
+<div class="highlight"><pre><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nt">"request"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"url"</span><span class="p">:</span> <span class="s2">"^/path/to/something$"</span><span class="p">,</span> 
+      <span class="nt">"post"</span><span class="p">:</span> <span class="s2">"this is some post data in textual format"</span><span class="p">,</span> 
+      <span class="nt">"headers"</span><span class="p">:</span> <span class="p">{</span>
+         <span class="nt">"authorization"</span><span class="p">:</span> <span class="s2">"Basic usernamez:passwordinBase64"</span>
+      <span class="p">},</span>
+      <span class="nt">"method"</span><span class="p">:</span> <span class="s2">"POST"</span>
+    <span class="p">},</span> 
+    <span class="nt">"response"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"status"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> 
+      <span class="nt">"headers"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span>
+      <span class="p">},</span>
+      <span class="nt">"latency"</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+      <span class="nt">"body"</span><span class="p">:</span> <span class="s2">"You're request was successfully processed!"</span>
+    <span class="p">}</span>
+  <span class="p">},</span> 
+  <span class="p">{</span>
+    <span class="nt">"request"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"url"</span><span class="p">:</span> <span class="s2">"^/path/to/anotherThing"</span><span class="p">,</span> 
+      <span class="nt">"query"</span><span class="p">:</span> <span class="p">{</span>
+         <span class="nt">"a"</span><span class="p">:</span> <span class="s2">"anything"</span><span class="p">,</span>
+         <span class="nt">"b"</span><span class="p">:</span> <span class="s2">"more"</span>
+      <span class="p">},</span>
+      <span class="nt">"headers"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span>
+      <span class="p">},</span>
+      <span class="nt">"post"</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> 
+      <span class="nt">"method"</span><span class="p">:</span> <span class="s2">"GET"</span>
+    <span class="p">},</span> 
+    <span class="nt">"response"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"status"</span><span class="p">:</span> <span class="mi">204</span><span class="p">,</span> 
+      <span class="nt">"headers"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
+        <span class="nt">"Access-Control-Allow-Origin"</span><span class="p">:</span> <span class="s2">"*"</span>
+      <span class="p">},</span> 
+      <span class="nt">"file"</span><span class="p">:</span> <span class="s2">"path/to/page.html"</span>
+    <span class="p">}</span>
+  <span class="p">},</span> 
+  <span class="p">{</span>
+    <span class="nt">"request"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"url"</span><span class="p">:</span> <span class="s2">"^/path/to/thing$"</span><span class="p">,</span>
+      <span class="nt">"headers"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span>
+      <span class="p">},</span>
+      <span class="nt">"post"</span><span class="p">:</span> <span class="s2">"this is some post data in textual format"</span><span class="p">,</span> 
+      <span class="nt">"method"</span><span class="p">:</span> <span class="s2">"POST"</span>
+    <span class="p">},</span> 
+    <span class="nt">"response"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"status"</span><span class="p">:</span> <span class="mi">304</span><span class="p">,</span> 
+      <span class="nt">"headers"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span>
+      <span class="p">}</span> 
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+<p>If you want to load more than one endpoint via file, use either a JSON array or YAML list (-) syntax. On success, the response will contain <code>Location</code> in the header with the newly created resources' location</p>
+
+<h3>Getting the Current List of Stubbed Endpoints</h3>
+
+<p>Performing a <code>GET</code> request on <code>localhost:8889</code> will return a JSON array of all currently saved responses. It will reply with <code>204 : No Content</code> if there are none saved.</p>
+
+<p>Performing a <code>GET</code> request on <code>localhost:8889/&lt;id&gt;</code> will return the JSON object representing the response with the supplied id.</p>
+
+<h4>The Status Page</h4>
+
+<p>You can also view the currently configured endpoints by going to <code>localhost:8889/status</code></p>
+
+<h3>Changing Existing Endpoints</h3>
+
+<p>Perform <code>PUT</code> requests in the same format as using <code>POST</code>, only this time supply the id in the path. For instance, to update the response with id 4 you would <code>PUT</code> to <code>localhost:8889/4</code>.</p>
+
+<h3>Deleting Endpoints</h3>
+
+<p>Send a <code>DELETE</code> request to <code>localhost:8889/&lt;id&gt;</code></p>
+
+<h2>The Stubs Portal</h2>
+
+<p>Requests sent to any url at <code>localhost:8882</code> (or wherever you told stubby to run) will search through the available endpoints and, if a match is found, respond with that endpoint's <code>response</code> data</p>
+
+<h3>How Endpoints Are Matched</h3>
+
+<p>For a given endpoint, stubby only cares about matching the properties of the request that have been defined in the YAML. The exception to this rule is <code>method</code>; if it is omitted it is defaulted to <code>GET</code>.</p>
+
+<p>For instance, the following will match any <code>POST</code> request to the root url:</p>
+
+<div class="highlight"><pre><span class="p-Indicator">-</span>  <span class="l-Scalar-Plain">request</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/</span>
+      <span class="l-Scalar-Plain">method</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">POST</span>
+   <span class="l-Scalar-Plain">response</span><span class="p-Indicator">:</span> <span class="p-Indicator">{}</span>
+</pre></div>
+
+<p>The request could have any headers and any post body it wants. It will match the above.</p>
+
+<p>Pseudocode:</p>
+
+<pre><code>for each &lt;endpoint&gt; of stored endpoints {
+
+   for each &lt;property&gt; of &lt;endpoint&gt; {
+      if &lt;endpoint&gt;.&lt;property&gt; != &lt;incoming request&gt;.&lt;property&gt;
+         next endpoint
+   }
+
+   return &lt;endpoint&gt;
+}
+</code></pre>
+
+<h2>Programmatic API</h2>
+
+<h3>The Stubby module</h3>
+
+<p>Add <code>stubby</code> as a reference within your project:</p>
+
+<pre><code>    PM&gt; Install-Package stubby
+</code></pre>
+
+<h2>See Also</h2>
+
+<ul>
+<li>
+<strong><a href="https://github.com/mrak/stubby4node">stubby4node</a>:</strong> A node.js implementation of stubby</li>
+<li>
+<strong><a href="https://github.com/azagniotov/stubby4j">stubby4j</a>:</strong> A java implementation of stubby</li>
+</ul><h2>TODO</h2>
+
+<ul>
+<li>
+<code>post</code> parameter as a hashmap under <code>request</code> for easy form-submission value matching</li>
+</ul><h2>NOTES</h2>
+
+<ul>
+<li>
+<strong>Copyright</strong> 2013 Eric Mrak, Alexander Zagniotov</li>
+<li>
+<strong>License</strong> Apache v2.0</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mrak">mrak</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
