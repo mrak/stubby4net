@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using NUnit.Framework;
+using stubby.CLI;
 using stubby.Domain;
 
 namespace unit {
@@ -9,6 +10,7 @@ namespace unit {
    public class EndpointDbTest {
       [SetUp]
       public void BeforeEach() {
+         Out.Mute = true;
          _endpointDb = new EndpointDb();
       }
 

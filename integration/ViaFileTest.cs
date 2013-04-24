@@ -10,6 +10,7 @@ namespace integration
       private readonly Stubby _stubby = new Stubby(new Arguments {
          Admin = 9999,
          Stubs = 9992,
+         Mute = true,
          Data = "../../YAML/e2e.yaml"
       });
 

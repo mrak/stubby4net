@@ -27,7 +27,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
-  <UsingTask TaskName="MSBuild.ExtensionPack.Framework.ILMerge" AssemblyFile="C:\Program Files\MSBuild\ExtensionPack\4.0\MSBuild.ExtensionPack.dll" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -116,20 +115,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="C:\Program Files\MSBuild\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <ItemGroup>
-      <Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\stubby.exe" />
-      <Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\*.dll" />
-      <!--<Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\CommandLine.dll"/>-->
-      <!--<Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\YamlDotNet.Core.dll"/>-->
-      <!--<Input Include="$(MSBuildProjectDirectory)\bin\$(Configuration)\YamlDotNet.RepresentationModel.dll"/>-->
-    </ItemGroup>
-    <MSBuild.ExtensionPack.Framework.ILMerge TargetPlatformVersion="v4" TargetPlatformDirectory="$(MSBuildBinPath)" LogMessages="true" LogFile="$(MSBuildProjectDirectory)\bin\ILMerge.log" InputAssemblies="@(Input)" OutputFile="$(MSBuildProjectDirectory)\bin\stubby.exe" />
-  </Target>
 </Project>

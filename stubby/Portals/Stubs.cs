@@ -97,7 +97,12 @@ namespace stubby.Portals {
       }
 
       private void AsyncHandler(IAsyncResult result) {
-         var context = _listener.EndGetContext(result);
+         HttpListenerContext context;
+         try {
+            context = _listener.EndGetContext(result);
+         } catch (HttpListenerException) {
+            return;
+         }
 
          utils.PrintIncoming(Name, context);
          utils.SetServerHeader(context);

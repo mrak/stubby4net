@@ -16,13 +16,16 @@ namespace stubby.Portals {
       private const string Root = "/";
       private const string IdUrls = @"^\/[1-9][0-9]*$";
       private const int UnprocessableEntity = 422;
-      private const string UnprocessableEntityMessage = "The request was well-formed but was unable to be followed due to semantic errors.";
+
+      private const string UnprocessableEntityMessage =
+         "The request was well-formed but was unable to be followed due to semantic errors.";
+
       private const string Pong = "pong";
       private readonly EndpointDb _endpointDb;
-      private readonly HttpListener _listener;
       private readonly IDictionary<string, Action<HttpListenerContext>> _idmethods;
-      private readonly IDictionary<string, Action<HttpListenerContext>> _rootmethods;
+      private readonly HttpListener _listener;
       private readonly IDictionary<string, Action<HttpListenerContext>> _pingmethods;
+      private readonly IDictionary<string, Action<HttpListenerContext>> _rootmethods;
       private readonly IDictionary<string, Action<HttpListenerContext>> _statusmethods;
 
       public Admin(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {}
@@ -30,14 +33,8 @@ namespace stubby.Portals {
       public Admin(EndpointDb endpointDb, HttpListener listener) {
          _endpointDb = endpointDb;
          _listener = listener;
-         _pingmethods = new Dictionary<string, Action<HttpListenerContext>> {
-            {"GET", GoPing},
-            {"HEAD", GoPing}
-         };
-         _statusmethods = new Dictionary<string, Action<HttpListenerContext>> {
-            {"GET", GoStatus},
-            {"HEAD", GoStatus}
-         };
+         _pingmethods = new Dictionary<string, Action<HttpListenerContext>> {{"GET", GoPing}, {"HEAD", GoPing}};
+         _statusmethods = new Dictionary<string, Action<HttpListenerContext>> {{"GET", GoStatus}, {"HEAD", GoStatus}};
          _idmethods = new Dictionary<string, Action<HttpListenerContext>> {
             {"GET", GoGet},
             {"HEAD", GoGet},
@@ -77,7 +74,10 @@ namespace stubby.Portals {
          else if (url.Equals(StatusUrl)) methods = _statusmethods;
          else if (url.Equals(Root)) methods = _rootmethods;
          else if (Regex.IsMatch(url, IdUrls)) methods = _idmethods;
-         else { utils.SetStatus(context, HttpStatusCode.NotFound); return; }
+         else {
+            utils.SetStatus(context, HttpStatusCode.NotFound);
+            return;
+         }
 
          if (methods.TryGetValue(context.Request.HttpMethod, out action)) action(context);
          else GoInvalid(context, methods.Keys);
@@ -181,7 +181,12 @@ namespace stubby.Portals {
       }
 
       private void AsyncHandler(IAsyncResult result) {
-         var context = _listener.EndGetContext(result);
+         HttpListenerContext context;
+         try {
+            context = _listener.EndGetContext(result);
+         } catch (HttpListenerException) {
+            return;
+         }
 
          utils.PrintIncoming(Name, context);
          utils.SetServerHeader(context);
