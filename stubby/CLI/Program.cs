@@ -9,7 +9,7 @@ namespace stubby.CLI {
          var exitEvent = new ManualResetEvent(false);
          var arguments = new Arguments();
 
-         if (!CommandLineParser.Default.ParseArguments(args, arguments)) return;
+         if (!Parser.Default.ParseArguments(args, arguments)) return;
          if (arguments.Version) { Out.Log(Stubby.Version); return; }
 
          Console.CancelKeyPress += (sender, eventArgs) => {

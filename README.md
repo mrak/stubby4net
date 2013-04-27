@@ -489,12 +489,111 @@ for each <endpoint> of stored endpoints {
 
 ## Programmatic API
 
-### The Stubby module
+### Referencing Stubby in Your Project
 
 Add `stubby` as a reference within your project:
 
 ```
     PM> Install-Package stubby
+```
+
+### The Arugments Class
+
+The `Arguments` class is a container for options used by the `Stubby` class during construction that correlate to the command-line options.
+
+#### Public Properties
+
+* __`Admin`-__ Port for admin portal. Defaults to `8889`.
+* __`Stubs`-__ Port for stubs portal. Defaults to `8882`.
+* __`Tls`-__ Port for stubs https portal. Defaults to `7443`.
+* __`Location`-__ Hostname at which to bind stubby. Defaults to `localhost`.
+* __`Data`-__ Data file location to pre-load endpoints. YAML format.
+* __`Mute`-__ Prevent stubby from logging to the console. Defaults to `true`.
+* __`Watch`-__ Monitor supplied data file for changes and reload endpoints if necessary. Defaults to `false`.
+
+Here is the constructor and default values of each (public) property.
+
+```cs
+public Arguments() {
+   Admin = 8889;
+   Stubs = 8882;
+   Tls = 7443;
+   Location = "localhost";
+   Data = null;
+   Mute = true;
+   Watch = false;
+}
+```
+
+#### The Stubby Class
+
+There is a single constructor that takes an instance of `Arguments` as it's parameter.
+
+```cs
+// Constructor
+public Stubby(IArguments arguments);
+
+//Start stubby's services
+public void Start();
+
+// Stop stubby's services
+public void Stop();
+
+// Get a listing of all of stubby's configured endpoints
+public IList<Endpoint> GetAll();
+
+// Get an endpoint back by id
+public Endpoint Get(uint id);
+
+// Find an endpoint by it's matching Request
+public Endpoint Find(Request request);
+
+// Swap out the configuration of one of the endpoints.
+// True if successful.
+public bool Replace(uint id, Endpoint endpoint);
+
+// Remove an endpoint by id
+// True if the operation succeeded
+public bool Delete(uint id);
+
+// Remove all configured endpoints from stubby
+public void DeleteAll();
+
+// Add a new endpoint configuration
+// out: the generated id
+// True if successful
+public bool Add(Endpoint endpoint, out uint id);
+
+// Add many new endpoint configurations
+// out: the generated ids
+// True if successful
+public bool Add(IEnumerable<Endpoint> endpoints, out IList<uint> ids);
+```
+
+#### An Example (Pardon my NUnit)
+
+```cs
+[TestFixture]
+public class MyIntegrationTest {
+   private readonly Stubby _stubby = new Stubby(new Arguments {
+      Admin = 9999,
+      Stubs = 9992,
+      Mute = true,
+      Data = "../../YAML/endpoints.yaml"
+   });
+
+   [TestFixtureSetUp]
+   public void Before() {
+      _stubby.Start();
+   }
+
+   [TestFixtureTearDown]
+   public void After() {
+      _stubby.Stop();
+   }
+
+   [Test]...
+}
 ```
 
 ## See Also

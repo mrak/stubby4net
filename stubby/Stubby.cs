@@ -66,8 +66,17 @@ namespace stubby {
       /// <summary>
       /// Get an endpoint back by id
       /// </summary>
+      /// <param name="id">The id of the endpoint to retrieve</param>
       public Endpoint Get(uint id) {
          return _endpointDb.Fetch(id);
+      }
+
+      /// <summary>
+      /// Find an endpoint by it's matching Request
+      /// </summary>
+      /// <param name="request">The signature of the request to find by</param>
+      public Endpoint Find(Request request) {
+         return _endpointDb.Find(new Endpoint {Request = request});
       }
 
       /// <summary>

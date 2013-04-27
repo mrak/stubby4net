@@ -18,7 +18,7 @@ namespace stubby.CLI {
       }
 
       public static void Linefeed() {
-         Log("");
+         if (!Mute) Log("");
       }
 
       public static void Warn(string message) {
