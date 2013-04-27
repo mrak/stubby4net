@@ -5,17 +5,37 @@ using Compare = stubby.Domain.ComparisonUtils;
 
 namespace stubby.Domain {
 
+   /// <summary>
+   /// Represents the configuration of a stubby response.
+   /// </summary>
    [DataContract]
    public class Response {
+
       public Response() {
          Status = 200;
          Headers = new NameValueCollection();
       }
 
+      /// <summary>
+      /// The HTTP/1.1 Status code (100-599).
+      /// </summary>
       [DataMember] public ushort Status { get; set; }
+
+      /// <summary>
+      /// Name/Value Collection of HTTP Response Headers.
+      /// </summary>
       [DataMember] public NameValueCollection Headers { get; set; }
+      /// <summary>
+      /// The time in milliseconds to wait before responding.
+      /// </summary>
       [DataMember] public ulong Latency { get; set; }
+      /// <summary>
+      /// The content body of the response. If File is supplied and the file exists, this property is ignored.
+      /// </summary>
       [DataMember] public string Body { get; set; }
+      /// <summary>
+      /// A filepath whose file contains the content of the response body. If defined, overrides the Body property.
+      /// </summary>
       [DataMember] public string File { get; set; }
 
       protected bool Equals(Response other) {

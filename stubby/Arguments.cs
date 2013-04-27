@@ -1,5 +1,8 @@
 ﻿namespace stubby
 {
+   /// <summary>
+   /// The options container class used by Stubby constructors.
+   /// </summary>
    public class Arguments : IArguments {
       ///<summary>
       /// Port for admin portal. Defaults to 8889.

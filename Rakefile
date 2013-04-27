@@ -7,11 +7,13 @@ product = "stubby"
 company = "Eric Mrak"
 copyright = "Copyright 2013"
 nuspec_file = 'stubby\stubby.nuspec'
+version = bumper_version.to_s.strip
+nupkg = "nuget/stubby.#{version}.nupkg"
 
 desc "Generate nuspec file"
 nuspec :nuspec do |ns|
    ns.id = product
-   ns.version = bumper_version.to_s.strip
+   ns.version = version
    ns.authors = company
    ns.description = description
    ns.title = title
@@ -20,22 +22,42 @@ nuspec :nuspec do |ns|
    ns.projectUrl = "https://github.com/mrak/stubby4net"
    ns.iconUrl = "http://stub.by/favicon.ico"
    ns.tags = "stub mock testing server"
-   ns.file 'bin\stubby.exe', "lib"
    ns.copyright = copyright
+
+   ns.file 'bin\stubby.exe', 'lib'
+   ns.file 'bin\Release\stubby.xml', 'lib'
 
    ns.output_file = nuspec_file
 end
 
 desc "Create nupkg files"
-exec :package => :nuspec do |cmd|
+exec :package => [:nuspec, :default] do |cmd|
    cmd.command = 'nuget.exe'
    cmd.parameters 'pack ' + nuspec_file + ' -Symbols -BasePath stubby -OutputDirectory nuget'
 end
 
+desc "Publish to NuGet"
+exec :publish => :package do |pub|
+   pub.command 'nuget.exe'
+   pub.parameters "push #{nupkg}"
+end
+
+desc "Publish to Chocolatey"
+exec :chocolatey => :package do |choc|
+   choc.command 'cpush'
+   choc.parameters nupkg
+end
+
+desc "Install locally as a command"
+task :install => :package do
+   %x{cd nuget; cinst stubby -source %cd%}
+end
+
+
 desc "Generate AsseblyInfo.cs"
 assemblyinfo :assemblyinfo do |asm|
-   asm.version = bumper_version.to_s.strip
-   asm.file_version = bumper_version.to_s.strip
+   asm.version = version
+   asm.file_version = version
    asm.company_name = company
    asm.product_name = product
    asm.title = title

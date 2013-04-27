@@ -11,6 +11,9 @@ using stubby.Portals;
 
 namespace stubby {
 
+   /// <summary>
+   /// The main stubby class whose instances host stubbed endpoints.
+   /// </summary>
    public class Stubby : IDisposable {
       internal static readonly Guid Guid = Assembly.GetExecutingAssembly().GetType().GUID;
       internal static readonly string Version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
@@ -20,6 +23,15 @@ namespace stubby {
       private readonly Admin _admin;
       private readonly Stubs _stubs;
 
+      /// <summary>
+      /// Construct stubby with default parameters.
+      /// </summary>
+      public Stubby() : this(new Arguments()) {}
+
+      /// <summary>
+      /// Costruct with specific options.
+      /// </summary>
+      /// <param name="arguments">The collection of options used by stubby.</param>
       public Stubby(IArguments arguments) {
          _arguments = arguments ?? new Arguments {Mute = true};
          _admin = new Admin(_endpointDb);
@@ -101,6 +113,7 @@ namespace stubby {
       /// <summary>
       /// Remove an endpoint by id
       /// </summary>
+      /// <param name="id">The id as returned by Add(..) or the Admin portal listing.</param>
       /// <returns>True if the operation succeeded</returns>
       public bool Delete(uint id) {
          return _endpointDb.Delete(id);
