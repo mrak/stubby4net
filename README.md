@@ -503,13 +503,13 @@ The `Arguments` class is a container for options used by the `Stubby` class duri
 
 #### Public Properties
 
-* __`Admin`-__ Port for admin portal. Defaults to `8889`.
-* __`Stubs`-__ Port for stubs portal. Defaults to `8882`.
-* __`Tls`-__ Port for stubs https portal. Defaults to `7443`.
-* __`Location`-__ Hostname at which to bind stubby. Defaults to `localhost`.
-* __`Data`-__ Data file location to pre-load endpoints. YAML format.
-* __`Mute`-__ Prevent stubby from logging to the console. Defaults to `true`.
-* __`Watch`-__ Monitor supplied data file for changes and reload endpoints if necessary. Defaults to `false`.
+* `Admin` - Port for admin portal. Defaults to `8889`.
+* `Stubs` - Port for stubs portal. Defaults to `8882`.
+* `Tls` - Port for stubs https portal. Defaults to `7443`.
+* `Location` - Hostname at which to bind stubby. Defaults to `localhost`.
+* `Data` - Data file location to pre-load endpoints. YAML format.
+* `Mute` - Prevent stubby from logging to the console. Defaults to `true`.
+* `Watch` - Monitor supplied data file for changes and reload endpoints if necessary. Defaults to `false`.
 
 Here is the constructor and default values of each (public) property.
 
