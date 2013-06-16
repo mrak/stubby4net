@@ -6,7 +6,7 @@ title = "stubby4net"
 product = "stubby"
 company = "Eric Mrak"
 copyright = "Copyright 2013"
-nuspec_file = 'stubby\stubby.nuspec'
+nuspec_file = 'stubby/stubby.nuspec'
 version = bumper_version.to_s.strip
 nupkg = "nuget/stubby.#{version}.nupkg"
 
@@ -24,8 +24,8 @@ nuspec :nuspec do |ns|
    ns.tags = "stub mock testing server"
    ns.copyright = copyright
 
-   ns.file 'bin\stubby.exe', 'lib'
-   ns.file 'bin\Release\stubby.xml', 'lib'
+   ns.file 'bin/stubby.exe', 'lib'
+   ns.file 'bin/Release/stubby.xml', 'lib'
 
    ns.output_file = nuspec_file
 end
@@ -38,13 +38,13 @@ end
 
 desc "Publish to NuGet"
 exec :publish => :package do |pub|
-   pub.command 'nuget.exe'
+   pub.command = 'nuget.exe'
    pub.parameters "push #{nupkg}"
 end
 
 desc "Publish to Chocolatey"
 exec :chocolatey => :package do |choc|
-   choc.command 'cpush'
+   choc.command = 'cpush'
    choc.parameters nupkg
 end
 
@@ -74,22 +74,27 @@ assemblyinfo :assemblyinfo do |asm|
 end
 
 desc "Build"
-msbuild :build => :assemblyinfo do |msb|
-   msb.properties = { :configuration => :Release }
-   msb.targets = [ :Clean, :Build ]
-   msb.solution = "stubby4net.sln"
+exec :build => :assemblyinfo do |xb|
+   xb.command = 'xbuild'
+   xb.parameters '/nologo stubby4net.sln'
 end
+#msbuild :build => :assemblyinfo do |msb|
+   #msb.command = "xbuild"
+   #msb.properties = { :configuration => :Release }
+   #msb.targets = [ :Clean, :Build ]
+   #msb.solution = "stubby4net.sln"
+#end
 
 desc "Merge together assemblies"
 exec :merge => :build do |ilm|
-   ilm.command = 'ilmerge'
-   ilm.parameters '/wildcards /out:stubby\bin\stubby.exe stubby\bin\Release\stubby.exe stubby\bin\Release\*.dll'
+   ilm.command = 'ILmerge.exe'
+   ilm.parameters '/wildcards /out:stubby/bin/stubby.exe stubby/bin/Release/stubby.exe stubby/bin/Release/*.dll'
    puts 'merging...'
 end
 
 desc "Test"
 nunit :test => :build do |nunit|
-   nunit.command = 'nunit-console'
+   nunit.command = 'nunit-console4'
    nunit.assemblies 'unit/bin/Release/unit.dll', 'integration/bin/Release/integration.dll'
 end
 
