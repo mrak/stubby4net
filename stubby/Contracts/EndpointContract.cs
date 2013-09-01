@@ -12,7 +12,7 @@ namespace stubby.Contracts {
             return new Endpoint
             {
                 Request = VerifyRequest(endpoint.Request),
-                Response = VerifyResponse(endpoint.Response)
+                Responses = VerifyResponses(endpoint.Responses)
             };
         }
 
@@ -50,6 +50,12 @@ namespace stubby.Contracts {
                 verified.Add(method.ToUpper());
 
             return verified;
+        }
+
+        private static IList<Response> VerifyResponses(IList<Response> responses){
+            if(responses == null || responses.Count == 0)
+                return new List<Response> { VerifyResponse(null) };
+            return (from response in responses select VerifyResponse(response)).ToList();
         }
 
         private static Response VerifyResponse(Response response) {

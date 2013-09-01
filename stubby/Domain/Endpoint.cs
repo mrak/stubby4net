@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace stubby.Domain {
 
@@ -10,7 +11,7 @@ namespace stubby.Domain {
 
         public Endpoint() {
             Request = new Request();
-            Response = new Response();
+            Responses = new List<Response>();
         }
 
         /// <summary>
@@ -23,11 +24,11 @@ namespace stubby.Domain {
         /// Used to generate a response to the client.
         /// </summary>
         [DataMember]
-        public Response Response { get; set; }
+        public IList<Response> Responses { get; set; }
 
         public override int GetHashCode() {
             unchecked {
-                return ((Request != null ? Request.GetHashCode() : 0) * 397) ^ (Response != null ? Response.GetHashCode() : 0);
+                return ((Request != null ? Request.GetHashCode() : 0) * 397) ^ (Responses != null ? Responses.GetHashCode() : 0);
             }
         }
 
@@ -40,7 +41,7 @@ namespace stubby.Domain {
         }
 
         protected bool Equals(Endpoint other) {
-            return Equals(Request, other.Request) && Equals(Response, other.Response);
+            return Equals(Request, other.Request) && Equals(Responses, other.Responses);
         }
 
         internal bool Matches(Endpoint other) {

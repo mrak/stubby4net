@@ -51,16 +51,16 @@ namespace stubby.Portals {
                 return;
             }
 
-            if(found.Response.Latency > 0)
-                System.Threading.Thread.Sleep((int) found.Response.Latency);
+            if(found.Latency > 0)
+                System.Threading.Thread.Sleep((int) found.Latency);
 
-            context.Response.StatusCode = found.Response.Status;
-            context.Response.Headers.Add(found.Response.Headers);
-            WriteResponseBody(context, found.Response);
+            context.Response.StatusCode = found.Status;
+            context.Response.Headers.Add(found.Headers);
+            WriteResponseBody(context, found);
             utils.PrintOutgoing(Name, context);
         }
 
-        private Endpoint FindEndpoint(HttpListenerContext context) {
+        private Response FindEndpoint(HttpListenerContext context) {
 
             var incoming = new Endpoint
             {

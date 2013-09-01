@@ -12,7 +12,7 @@ namespace unit {
             _endpoint = new Endpoint
             {
                 Request = { Url = "/something" },
-                Response = { Status = 200 }
+                Responses = new List<Response> { new Response { Status = 200 }}
             };
         }
 
@@ -28,12 +28,12 @@ namespace unit {
         [Test]
         public void Verify_Headers_ShouldReturnNew_IfNull() {
             _endpoint.Request.Headers = null;
-            _endpoint.Response.Headers = null;
+            _endpoint.Responses[0].Headers = null;
 
             var actual = sut.Verify(_endpoint);
 
             Assert.NotNull(actual.Request.Headers);
-            Assert.NotNull(actual.Response.Headers);
+            Assert.NotNull(actual.Responses[0].Headers);
         }
 
         [Test]
@@ -88,50 +88,50 @@ namespace unit {
 
         [Test]
         public void Verify_Response_ShouldReturnNew_IfNull() {
-            _endpoint.Response = null;
+            _endpoint.Responses = null;
             var actual = sut.Verify(_endpoint);
 
-            Assert.NotNull(actual.Response);
+            Assert.NotNull(actual.Responses);
         }
 
         [Test]
         public void Verify_Status_ShouldBe200_When600() {
             const int expected = 200;
-            _endpoint.Response.Status = 600;
+            _endpoint.Responses[0].Status = 600;
 
             var actual = sut.Verify(_endpoint);
 
-            Assert.AreEqual(expected, actual.Response.Status);
+            Assert.AreEqual(expected, actual.Responses[0].Status);
         }
 
         [Test]
         public void Verify_Status_ShouldBe200_WhenGreaterThan600() {
             const int expected = 200;
-            _endpoint.Response.Status = 666;
+            _endpoint.Responses[0].Status = 666;
 
             var actual = sut.Verify(_endpoint);
 
-            Assert.AreEqual(expected, actual.Response.Status);
+            Assert.AreEqual(expected, actual.Responses[0].Status);
         }
 
         [Test]
         public void Verify_Status_ShouldBe200_WhenLessThan100() {
             const int expected = 200;
-            _endpoint.Response.Status = 42;
+            _endpoint.Responses[0].Status = 42;
 
             var actual = sut.Verify(_endpoint);
 
-            Assert.AreEqual(expected, actual.Response.Status);
+            Assert.AreEqual(expected, actual.Responses[0].Status);
         }
 
         [Test]
         public void Verify_Status_ShouldBeGiven_WhenBetween100And600() {
             const int expected = 420;
-            _endpoint.Response.Status = expected;
+            _endpoint.Responses[0].Status = expected;
 
             var actual = sut.Verify(_endpoint);
 
-            Assert.AreEqual(expected, actual.Response.Status);
+            Assert.AreEqual(expected, actual.Responses[0].Status);
         }
 
         [Test]

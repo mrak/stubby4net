@@ -285,5 +285,37 @@ namespace integration {
          
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
+
+        [Test]
+        [ExpectedException("System.Net.WebException", ExpectedMessage="The remote server returned an error: (400) Bad Request.")]
+        public void MultiResonpse_ShouldFollowSequence(){
+            var request = WebRequest.Create("http://localhost:9992/multi-response");
+            var request2 = WebRequest.Create("http://localhost:9992/multi-response");
+
+            var response = (HttpWebResponse) request.GetResponse();
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            response = (HttpWebResponse) request2.GetResponse();
+
+            Assert.Fail();
+        }
+
+        [Test]
+        public void MultiResonpse_ShouldCycleSequence(){
+            var request = WebRequest.Create("http://localhost:9992/multi-response");
+            var request2 = WebRequest.Create("http://localhost:9992/multi-response");
+            var request3 = WebRequest.Create("http://localhost:9992/multi-response");
+
+            var response = (HttpWebResponse) request.GetResponse();
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            try{
+                response = (HttpWebResponse) request2.GetResponse();
+            } catch (WebException e) {
+            }
+
+            response = (HttpWebResponse) request3.GetResponse();
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
     }
 }

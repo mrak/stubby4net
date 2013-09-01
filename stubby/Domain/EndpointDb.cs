@@ -11,6 +11,7 @@ namespace stubby.Domain {
         private readonly ConcurrentDictionary<uint, Endpoint> _dictionary = new ConcurrentDictionary<uint, Endpoint>();
         private readonly object _lock = new object();
         private uint _nextId;
+        private IDictionary<uint, int> _sightings = new Dictionary<uint, int>();
 
         public bool Notify { get; set; }
 
@@ -31,8 +32,8 @@ namespace stubby.Domain {
                 return false;
 
             var methods = verified.Request.Method.Aggregate("", (current, verb) => current + (verb + ",")).TrimEnd(',');
-            if(Notify)
-                Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
+            _sightings.Add(id, 0);
+            if(Notify) Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
             return true;
         }
 
@@ -52,8 +53,21 @@ namespace stubby.Domain {
             return true;
         }
 
-        public Endpoint Find(Endpoint incoming) {
-            return (from stored in _dictionary where stored.Value.Matches(incoming) select stored.Value).FirstOrDefault();
+        public Response Find(Endpoint incoming) {
+            KeyValuePair<uint, Endpoint> keyValue;
+            try {
+                keyValue = (from stored in _dictionary where stored.Value.Matches(incoming) select stored).First();
+            } catch {
+                return null;
+            }
+
+            var id = keyValue.Key;
+            var endpoint = keyValue.Value;
+
+            int sightings = _sightings[id];
+            _sightings[id] = sightings + 1;
+
+            return keyValue.Value.Responses[sightings % endpoint.Responses.Count];
         }
 
         public Endpoint Fetch(uint id) {

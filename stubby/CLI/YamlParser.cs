@@ -58,7 +58,7 @@ namespace stubby.CLI {
                         }
                     case "response":
                         {
-                            endpoint.Response = ParseResponse((YamlMappingNode) requestResponse.Value);
+                            endpoint.Responses = ParseResponses(requestResponse);
                             break;
                         }
                 }
@@ -130,6 +130,12 @@ namespace stubby.CLI {
                 methods.AddRange(from method in (YamlSequenceNode) yamlMethod.Value select method.ToString().ToUpper());
 
             return methods;
+        }
+
+        private static IList<Response> ParseResponses(KeyValuePair<YamlNode, YamlNode> yamlResponse){
+            if(yamlResponse.Value.GetType() == typeof(YamlSequenceNode))
+                return (from response in (YamlSequenceNode) yamlResponse.Value select ParseResponse((YamlMappingNode) response)).ToList();            else
+            return new List<Response> {ParseResponse((YamlMappingNode) yamlResponse.Value)};
         }
 
         private static Response ParseResponse(YamlMappingNode yamlResponse) {

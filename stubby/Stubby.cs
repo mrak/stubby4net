@@ -40,8 +40,6 @@ namespace stubby {
 
             Out.Mute = _arguments.Mute;
             LoadEndpoints();
-            if(!_arguments.Watch)
-                return;
 
             _watcher.Path = Path.GetDirectoryName(_arguments.Data);
             _watcher.Filter = Path.GetFileName(_arguments.Data);
@@ -89,7 +87,7 @@ namespace stubby {
         /// Find an endpoint by it's matching Request
         /// </summary>
         /// <param name="request">The signature of the request to find by</param>
-        public Endpoint Find(Request request) {
+        public Response Find(Request request) {
             return _endpointDb.Find(new Endpoint { Request = request });
         }
 

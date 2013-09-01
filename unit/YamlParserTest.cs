@@ -64,34 +64,34 @@ namespace unit {
         [Test]
         public void ShouldParseResponse_WithBody() {
             var endpoint = YamlParser.FromFile("../../YAML/response-body.yaml")[0];
-            Assert.AreEqual("body contents!", endpoint.Response.Body);
+            Assert.AreEqual("body contents!", endpoint.Responses[0].Body);
         }
 
         [Test]
         public void ShouldParseResponse_WithFile() {
             const string file = "../../YAML/response-file.yaml";
             var endpoint = YamlParser.FromFile(file)[0];
-            Assert.AreEqual(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "path/to/response/body")), endpoint.Response.File);
+            Assert.AreEqual(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "path/to/response/body")), endpoint.Responses[0].File);
         }
 
         [Test]
         public void ShouldParseResponse_WithHeaders() {
             var endpoint = YamlParser.FromFile("../../YAML/response-headers.yaml")[0];
 
-            Assert.AreEqual("application/json", endpoint.Response.Headers["content-type"]);
-            Assert.AreEqual("application/json", endpoint.Response.Headers["accept"]);
+            Assert.AreEqual("application/json", endpoint.Responses[0].Headers["content-type"]);
+            Assert.AreEqual("application/json", endpoint.Responses[0].Headers["accept"]);
         }
 
         [Test]
         public void ShouldParseResponse_WithLatency() {
             var endpoint = YamlParser.FromFile("../../YAML/response-latency.yaml")[0];
-            Assert.AreEqual(987654321, endpoint.Response.Latency);
+            Assert.AreEqual(987654321, endpoint.Responses[0].Latency);
         }
 
         [Test]
         public void ShouldParseResponse_WithStatus() {
             var endpoint = YamlParser.FromFile("../../YAML/response-status.yaml")[0];
-            Assert.AreEqual(204, endpoint.Response.Status);
+            Assert.AreEqual(204, endpoint.Responses[0].Status);
         }
 
         [Test]

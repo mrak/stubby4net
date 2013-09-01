@@ -68,6 +68,7 @@
     <Reference Include="YamlDotNet.RepresentationModel">
       <HintPath>..\packages\YamlDotNet.RepresentationModel.2.0.1\lib\net35\YamlDotNet.RepresentationModel.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arguments.cs" />
