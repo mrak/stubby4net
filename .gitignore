@@ -88,6 +88,9 @@ packages
 csx
 *.build.csdef
 
+# NUnit test results
+test-results/
+
 # Windows Store app package directory
 AppPackages/
 

@@ -62,13 +62,13 @@
     <Reference Include="CommandLine">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net40\CommandLine.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="YamlDotNet.Core">
-      <HintPath>..\packages\YamlDotNet.Core.2.0.1\lib\net35\YamlDotNet.Core.dll</HintPath>
+      <HintPath>..\packages\YamlDotNet.Core.2.2.0\lib\net35\YamlDotNet.Core.dll</HintPath>
     </Reference>
     <Reference Include="YamlDotNet.RepresentationModel">
-      <HintPath>..\packages\YamlDotNet.RepresentationModel.2.0.1\lib\net35\YamlDotNet.RepresentationModel.dll</HintPath>
+      <HintPath>..\packages\YamlDotNet.RepresentationModel.2.2.0\lib\net35\YamlDotNet.RepresentationModel.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arguments.cs" />

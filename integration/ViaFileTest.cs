@@ -311,8 +311,7 @@ namespace integration {
 
             try{
                 response = (HttpWebResponse) request2.GetResponse();
-            } catch (WebException e) {
-            }
+            } catch { }
 
             response = (HttpWebResponse) request3.GetResponse();
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);

@@ -1,19 +1,30 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="integration/ViaFileTest.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="stubby/CLI/YamlParser.cs">
     <Files>
-      <File FileName="integration/ViaFileTest.cs" Line="171" Column="36" />
+      <File FileName="unit/EndpointDbTest.cs" Line="76" Column="28" />
+      <File FileName="stubby/Domain/EndpointDb.cs" Line="57" Column="41" />
+      <File FileName="stubby/Domain/Endpoint.cs" Line="27" Column="20" />
+      <File FileName="stubby/Contracts/EndpointContract.cs" Line="58" Column="21" />
+      <File FileName="unit/EndointContractTest.cs" Line="92" Column="1" />
+      <File FileName="integration/ViaFileTest.cs" Line="314" Column="24" />
+      <File FileName="stubby/CLI/YamlParser.cs" Line="137" Column="58" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="integration" expanded="True">
-            <Node name="References" expanded="True" />
-            <Node name="ViaFileTest.cs" selected="True" />
+            <Node name="Properties" expanded="True" />
+            <Node name="YAML" expanded="True" />
           </Node>
-          <Node name="stubby" expanded="True" />
+          <Node name="stubby" expanded="True" selected="True">
+            <Node name="CLI" expanded="True" />
+            <Node name="Portals" expanded="True" />
+            <Node name="Properties" expanded="True" />
+          </Node>
           <Node name="unit" expanded="True">
-            <Node name="References" expanded="True" />
+            <Node name="Files" expanded="True" />
+            <Node name="Properties" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -29,7 +40,9 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/mrak/Developer/Projects/stubby4net/stubby/Domain/EndpointDb.cs" line="31" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

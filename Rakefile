@@ -32,13 +32,13 @@ end
 
 desc "Create nupkg files"
 exec :package => [:nuspec, :default] do |cmd|
-   cmd.command = 'nuget.exe'
+   cmd.command = '/home/mrak/bin/nuget'
    cmd.parameters 'pack ' + nuspec_file + ' -Symbols -BasePath stubby -OutputDirectory nuget'
 end
 
 desc "Publish to NuGet"
 exec :publish => :package do |pub|
-   pub.command = 'nuget.exe'
+   pub.command = '/home/mrak/bin/nuget'
    pub.parameters "push #{nupkg}"
 end
 
@@ -76,7 +76,7 @@ end
 desc "Build"
 exec :build => :assemblyinfo do |xb|
    xb.command = 'xbuild'
-   xb.parameters '/nologo stubby4net.sln'
+   xb.parameters '/nologo /target:Build stubby4net.sln'
 end
 #msbuild :build => :assemblyinfo do |msb|
    #msb.command = "xbuild"
