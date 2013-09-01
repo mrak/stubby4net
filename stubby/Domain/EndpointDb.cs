@@ -6,87 +6,91 @@ using Defaults = stubby.Contracts.EndpointContract;
 
 namespace stubby.Domain {
 
-   internal class EndpointDb {
-      private const string Loaded = "Loaded {0} {1}";
-      private readonly ConcurrentDictionary<uint, Endpoint> _dictionary = new ConcurrentDictionary<uint, Endpoint>();
-      private readonly object _lock = new object();
-      private uint _nextId;
-      public bool Notify { get; set; }
+    internal class EndpointDb {
+        private const string Loaded = "Loaded {0} {1}";
+        private readonly ConcurrentDictionary<uint, Endpoint> _dictionary = new ConcurrentDictionary<uint, Endpoint>();
+        private readonly object _lock = new object();
+        private uint _nextId;
 
-      public EndpointDb() {
-         Notify = true;
-      }
+        public bool Notify { get; set; }
 
-      public bool Insert(Endpoint endpoint) {
-         uint i;
-         return Insert(endpoint, out i);
-      }
+        public EndpointDb() {
+            Notify = true;
+        }
 
-      public bool Insert(Endpoint endpoint, out uint id) {
-         id = NextId();
-         var verified = Defaults.Verify(endpoint);
+        public bool Insert(Endpoint endpoint) {
+            uint i;
+            return Insert(endpoint, out i);
+        }
 
-         if (!_dictionary.TryAdd(id, verified)) return false;
+        public bool Insert(Endpoint endpoint, out uint id) {
+            id = NextId();
+            var verified = Defaults.Verify(endpoint);
 
-         var methods = verified.Request.Method.Aggregate("", (current, verb) => current + (verb + ",")).TrimEnd(',');
-         if(Notify) Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
-         return true;
-      }
+            if(!_dictionary.TryAdd(id, verified))
+                return false;
 
-      public bool Insert(IEnumerable<Endpoint> endpoints) {
-         IList<uint> ids;
-         return Insert(endpoints, out ids);
-      }
+            var methods = verified.Request.Method.Aggregate("", (current, verb) => current + (verb + ",")).TrimEnd(',');
+            if(Notify)
+                Out.Notice(string.Format(Loaded, methods, verified.Request.Url));
+            return true;
+        }
 
-      public bool Insert(IEnumerable<Endpoint> endpoints, out IList<uint> ids) {
-         ids = new List<uint>();
-         foreach (var endpoint in endpoints) {
-            uint id;
-            if (!Insert(endpoint, out id)) return false;
-            ids.Add(id);
-         }
-         return true;
-      }
+        public bool Insert(IEnumerable<Endpoint> endpoints) {
+            IList<uint> ids;
+            return Insert(endpoints, out ids);
+        }
 
-      public Endpoint Find(Endpoint incoming) {
-         return (from stored in _dictionary where stored.Value.Matches(incoming) select stored.Value).FirstOrDefault();
-      }
+        public bool Insert(IEnumerable<Endpoint> endpoints, out IList<uint> ids) {
+            ids = new List<uint>();
+            foreach(var endpoint in endpoints) {
+                uint id;
+                if(!Insert(endpoint, out id))
+                    return false;
+                ids.Add(id);
+            }
+            return true;
+        }
 
-      public Endpoint Fetch(uint id) {
-         Endpoint fetched;
-         _dictionary.TryGetValue(id, out fetched);
-         return fetched;
-      }
+        public Endpoint Find(Endpoint incoming) {
+            return (from stored in _dictionary where stored.Value.Matches(incoming) select stored.Value).FirstOrDefault();
+        }
 
-      public bool Replace(uint id, Endpoint endpoint) {
-         if (!_dictionary.ContainsKey(id)) return false;
+        public Endpoint Fetch(uint id) {
+            Endpoint fetched;
+            _dictionary.TryGetValue(id, out fetched);
+            return fetched;
+        }
 
-         _dictionary[id] = Defaults.Verify(endpoint);
-         return true;
-      }
+        public bool Replace(uint id, Endpoint endpoint) {
+            if(!_dictionary.ContainsKey(id))
+                return false;
 
-      public bool Replace(IEnumerable<KeyValuePair<uint, Endpoint>> endpoints) {
-         return endpoints.All(pair => Replace(pair.Key, pair.Value));
-      }
+            _dictionary[id] = Defaults.Verify(endpoint);
+            return true;
+        }
 
-      public IList<Endpoint> Fetch() {
-         return _dictionary.Select(endpoint => endpoint.Value).ToList();
-      }
+        public bool Replace(IEnumerable<KeyValuePair<uint, Endpoint>> endpoints) {
+            return endpoints.All(pair => Replace(pair.Key, pair.Value));
+        }
 
-      public void Delete() {
-         _dictionary.Clear();
-      }
+        public IList<Endpoint> Fetch() {
+            return _dictionary.Select(endpoint => endpoint.Value).ToList();
+        }
 
-      public bool Delete(uint id) {
-         Endpoint removed;
-         return _dictionary.TryRemove(id, out removed);
-      }
+        public void Delete() {
+            _dictionary.Clear();
+        }
 
-      private uint NextId() {
-         lock (_lock) {
-            return _nextId++;
-         }
-      }
-   }
+        public bool Delete(uint id) {
+            Endpoint removed;
+            return _dictionary.TryRemove(id, out removed);
+        }
 
+        private uint NextId() {
+            lock(_lock) {
+                return _nextId++;
+            }
+        }
+    }
 }
