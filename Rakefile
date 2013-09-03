@@ -76,7 +76,7 @@ end
 desc "Build"
 exec :build => :assemblyinfo do |xb|
    xb.command = 'xbuild'
-   xb.parameters '/nologo /target:Build stubby4net.sln'
+   xb.parameters '/nologo /p:Configuration=Release /target:Build stubby4net.sln'
 end
 #msbuild :build => :assemblyinfo do |msb|
    #msb.command = "xbuild"

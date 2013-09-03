@@ -1,13 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="stubby/Domain/Request.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="stubby/CLI/Out.cs">
     <Files>
-      <File FileName="unit/EndpointDbTest.cs" Line="76" Column="28" />
-      <File FileName="stubby/Domain/EndpointDb.cs" Line="57" Column="41" />
-      <File FileName="stubby/Domain/Endpoint.cs" Line="27" Column="20" />
-      <File FileName="stubby/Contracts/EndpointContract.cs" Line="58" Column="21" />
-      <File FileName="unit/EndointContractTest.cs" Line="92" Column="1" />
-      <File FileName="stubby/Domain/Request.cs" Line="58" Column="53" />
+      <File FileName="unit/EndpointDbTest.cs" Line="1" Column="1" />
+      <File FileName="stubby/Domain/EndpointDb.cs" Line="1" Column="1" />
+      <File FileName="stubby/Domain/Endpoint.cs" Line="1" Column="1" />
+      <File FileName="stubby/Contracts/EndpointContract.cs" Line="1" Column="1" />
+      <File FileName="unit/EndointContractTest.cs" Line="1" Column="1" />
+      <File FileName="stubby/Domain/Request.cs" Line="1" Column="1" />
+      <File FileName="stubby/Stubby.cs" Line="1" Column="1" />
+      <File FileName="stubby/CLI/Out.cs" Line="12" Column="45" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -16,13 +18,7 @@
             <Node name="Properties" expanded="True" />
             <Node name="YAML" expanded="True" />
           </Node>
-          <Node name="stubby" expanded="True">
-            <Node name="CLI" expanded="True" />
-            <Node name="Domain" expanded="True">
-              <Node name="Request.cs" selected="True" />
-            </Node>
-          </Node>
-          <Node name="unit" expanded="True">
+          <Node name="unit" expanded="True" selected="True">
             <Node name="Files" expanded="True" />
             <Node name="Properties" expanded="True" />
           </Node>

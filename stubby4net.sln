@@ -13,6 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37C48152-A8BE-41EE-8B5F-1BBF1A63D049}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -21,10 +25,9 @@ Global
 		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9FEF00C-D77B-4406-9407-BF8CA9C6A72C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A83F1AA-2F6D-4B28-9C0E-08A0CABFA908}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = stubby\stubby.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
