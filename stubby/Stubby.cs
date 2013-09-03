@@ -41,6 +41,9 @@ namespace stubby {
             Out.Mute = _arguments.Mute;
             LoadEndpoints();
 
+            if(!_arguments.Watch)
+                return;
+
             _watcher.Path = Path.GetDirectoryName(_arguments.Data);
             _watcher.Filter = Path.GetFileName(_arguments.Data);
             _watcher.Changed += OnDatafileChange;
