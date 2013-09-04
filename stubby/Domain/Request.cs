@@ -59,7 +59,7 @@ namespace stubby.Domain {
                 IList<string> otherValues = other.Headers.GetValues(header);
                 if(otherValues == null)
                     return false;
-                if(!Headers.GetValues(header).All(otherValues.Contains))
+                if(!Headers.GetValues(header).All(h => otherValues.Any(o => Regex.IsMatch(o, h))))
                     return false;
             }
 
@@ -67,14 +67,14 @@ namespace stubby.Domain {
                 IList<string> otherValues = other.Query.GetValues(variable);
                 if(otherValues == null)
                     return false;
-                if(!Query.GetValues(variable).All(otherValues.Contains))
+                if(!Query.GetValues(variable).All(q => otherValues.Any(o => Regex.IsMatch(o, q))))
                     return false;
             }
 
             try {
-                return System.IO.File.ReadAllText(File).TrimEnd(' ', '\n', '\r', '\t') == other.Post;
+                return Regex.IsMatch(other.Post, System.IO.File.ReadAllText(File).TrimEnd(' ', '\n', '\r', '\t'));
             } catch {
-                if(Post != null && Post != other.Post)
+                if(Post != null && !Regex.IsMatch(other.Post, Post))
                     return false;
             }
 
