@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Json;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using stubby.CLI;
+using System.Web.Script.Serialization;
 
 namespace stubby.Portals {
 
@@ -57,10 +58,9 @@ namespace stubby.Portals {
         }
 
         public static void SerializeToJson<T>(T entity, HttpListenerContext context) {
-            var serializer = new DataContractJsonSerializer(typeof(T));
+            var serializer = new JavaScriptSerializer();
             SetJsonType(context);
-
-            serializer.WriteObject(context.Response.OutputStream, entity);
+			WriteBody(context, serializer.Serialize(entity));
         }
 
         public static void WriteBody(HttpListenerContext context, string body) {

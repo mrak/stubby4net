@@ -1,6 +1,6 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="stubby/CLI/Out.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="stubby/Portals/Admin.cs">
     <Files>
       <File FileName="unit/EndpointDbTest.cs" Line="1" Column="1" />
       <File FileName="stubby/Domain/EndpointDb.cs" Line="1" Column="1" />
@@ -10,6 +10,9 @@
       <File FileName="stubby/Domain/Request.cs" Line="1" Column="1" />
       <File FileName="stubby/Stubby.cs" Line="1" Column="1" />
       <File FileName="stubby/CLI/Out.cs" Line="12" Column="45" />
+      <File FileName="stubby/Portals/Stubs.cs" Line="24" Column="10" />
+      <File FileName="stubby/Portals/Admin.cs" Line="228" Column="1" />
+      <File FileName="stubby/Portals/PortalUtils.cs" Line="59" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,7 +21,11 @@
             <Node name="Properties" expanded="True" />
             <Node name="YAML" expanded="True" />
           </Node>
-          <Node name="unit" expanded="True" selected="True">
+          <Node name="stubby" expanded="True" selected="True">
+            <Node name="CLI" expanded="True" />
+            <Node name="Portals" expanded="True" />
+          </Node>
+          <Node name="unit" expanded="True">
             <Node name="Files" expanded="True" />
             <Node name="Properties" expanded="True" />
           </Node>
@@ -27,17 +34,18 @@
       <Pad Id="ClassPad">
         <State expanded="True" selected="True" />
       </Pad>
-      <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State expanded="True" selected="True" />
-      </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
         <State />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True" selected="True" />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/home/mrak/Developer/Projects/stubby4net/stubby/Domain/EndpointDb.cs" line="31" column="1" />
+      <Breakpoint file="/home/mrak/Developer/Projects/stubby4net/stubby/Portals/Admin.cs" line="228" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
