@@ -53,7 +53,7 @@ namespace stubby.Portals {
         }
 
         public static void SetHtmlType(HttpListenerContext context) {
-            context.Response.Headers.Set(HttpRequestHeader.ContentType, HtmlMimeType);
+            context.Response.Headers.Set(HttpResponseHeader.ContentType, HtmlMimeType);
         }
 
         public static void SerializeToJson<T>(T entity, HttpListenerContext context) {
