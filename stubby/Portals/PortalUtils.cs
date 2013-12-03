@@ -49,7 +49,7 @@ namespace stubby.Portals {
         }
 
         public static void SetJsonType(HttpListenerContext context) {
-            context.Response.Headers.Set(HttpRequestHeader.ContentType, JsonMimeType);
+            context.Response.Headers.Set(HttpResponseHeader.ContentType, JsonMimeType);
         }
 
         public static void SetHtmlType(HttpListenerContext context) {
