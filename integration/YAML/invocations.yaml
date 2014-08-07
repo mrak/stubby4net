@@ -1,0 +1,3 @@
+- request:
+    url: /basic
+    method: [put, post, delete, get]

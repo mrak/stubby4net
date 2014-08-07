@@ -19,6 +19,7 @@ namespace stubby {
         internal static readonly string Version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
         private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
         private readonly EndpointDb _endpointDb = new EndpointDb();
+		private readonly InvocationDb _invocationDb = new InvocationDb();
         private readonly IArguments _arguments;
         private readonly Admin _admin;
         private readonly Stubs _stubs;
@@ -35,8 +36,8 @@ namespace stubby {
         /// <param name="arguments">The collection of options used by stubby.</param>
         public Stubby(IArguments arguments) {
             _arguments = arguments ?? new Arguments { Mute = true };
-            _admin = new Admin(_endpointDb);
-            _stubs = new Stubs(_endpointDb);
+			_admin = new Admin(_endpointDb, _invocationDb);
+			_stubs = new Stubs(_endpointDb, _invocationDb);
 
             Out.Mute = _arguments.Mute;
             LoadEndpoints();

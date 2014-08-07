@@ -170,7 +170,7 @@ namespace integration {
         [Test]
         public void EndpointRespondsTo_DifferentQueryParameters_ForSameUrl() {
             const string expectedBody = "second query";
-            var request = WebRequest.Create("http://localhost:9992/get/query?first=value1again&second=value2again");
+            var request = WebRequest.Create("http://localhost:9992/get/query?first=valueagain1&second=valueagain2");
             var response = (HttpWebResponse) request.GetResponse();
             var actualBody = TestUtils.ExtractBody(response);
          
@@ -179,7 +179,7 @@ namespace integration {
         }
 
         [Test]
-        public void BasicAuthroization_IsConfigurableWith_Base64() {
+        public void BasicAuthorization_IsConfigurableWith_Base64() {
             const string expectedBody = "resource has been created";
             var request = WebRequest.Create("http://localhost:9992/post/auth");
             request.Method = "post";
@@ -194,7 +194,7 @@ namespace integration {
         }
 
         [Test]
-        public void BasicAuthroization_IsConfigurableWith_ColonNotation() {
+        public void BasicAuthorization_IsConfigurableWith_ColonNotation() {
             const string expectedBody = "resource has been created";
             var request = WebRequest.Create("http://localhost:9992/post/auth/pair");
             request.Method = "post";
@@ -209,7 +209,7 @@ namespace integration {
         }
 
         [Test]
-        public void BasicAuthroization_IsConfigurableWith_ColonNotation_AndBasicExplicitlyDeclared() {
+        public void BasicAuthorization_IsConfigurableWith_ColonNotation_AndBasicExplicitlyDeclared() {
             const string expectedBody = "resource has been created";
             var request = WebRequest.Create("http://localhost:9992/post/auth/pair/extrabasic");
             request.Method = "post";
@@ -236,7 +236,7 @@ namespace integration {
             var actualBody = TestUtils.ExtractBody(response);
             stopwatch.Stop();
 
-            Assert.IsTrue(stopwatch.ElapsedMilliseconds > 2000, "Responded too soon");
+            Assert.IsTrue(stopwatch.ElapsedMilliseconds >= 2000, "Responded too soon");
             Assert.IsTrue(stopwatch.ElapsedMilliseconds < 2500, "Responded too late");
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(expectedBody, actualBody);

@@ -39,7 +39,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <Commandlineparameters></Commandlineparameters>
+    <Commandlineparameters>
+    </Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -82,6 +83,8 @@
     <Compile Include="Domain\ComparisonUtils.cs" />
     <Compile Include="Domain\Endpoint.cs" />
     <Compile Include="Domain\EndpointDb.cs" />
+    <Compile Include="Domain\Invocation.cs" />
+    <Compile Include="Domain\InvocationDb.cs" />
     <Compile Include="Domain\Request.cs" />
     <Compile Include="Domain\Response.cs" />
     <Compile Include="Exceptions\EndpointParsingException.cs" />

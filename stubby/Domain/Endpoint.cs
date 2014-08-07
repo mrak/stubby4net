@@ -1,5 +1,8 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Specialized;
+using System.Net;
+using System.Runtime.Serialization;
 using System.Collections.Generic;
+using stubby.Portals;
 
 namespace stubby.Domain {
 

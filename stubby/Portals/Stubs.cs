@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using stubby.Domain;
@@ -14,13 +12,17 @@ namespace stubby.Portals {
         private const string UnexpectedError = "unexpectedtly generated a server error";
         private readonly EndpointDb _endpointDb;
         private readonly HttpListener _listener;
+    	private readonly InvocationDb _invocationDb;
 
-        public Stubs(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {
+		public Stubs(EndpointDb endpointDb, InvocationDb invocationDb)
+			: this(endpointDb, invocationDb, new HttpListener())
+		{
         }
 
-        public Stubs(EndpointDb endpointDb, HttpListener listener) {
+        public Stubs(EndpointDb endpointDb, InvocationDb invocationDb, HttpListener listener) {
             _endpointDb = endpointDb;
             _listener = listener;
+        	_invocationDb = invocationDb;
         }
 
         public void Dispose() {
@@ -42,42 +44,30 @@ namespace stubby.Portals {
             utils.PrintListening(Name, location, httpsPort);
         }
 
-        private void ResponseHandler(HttpListenerContext context) {
-            var found = FindEndpoint(context);
+		private void ResponseHandler(HttpListenerContext context)
+		{
+			var incoming = context.ToEndpoint();
+			var found = _endpointDb.Find(incoming);
 
-            if(found == null) {
-                context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                utils.PrintOutgoing(Name, context, UnregisteredEndoint);
-                return;
-            }
+			if (found == null)
+			{
+				context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+				utils.PrintOutgoing(Name, context, UnregisteredEndoint);
+				return;
+			}
 
-            if(found.Latency > 0)
-                System.Threading.Thread.Sleep((int) found.Latency);
+			if (found.Latency > 0)
+				System.Threading.Thread.Sleep((int) found.Latency);
 
-            context.Response.StatusCode = found.Status;
-            context.Response.Headers.Add(found.Headers);
-            WriteResponseBody(context, found);
-            utils.PrintOutgoing(Name, context);
-        }
+			context.Response.StatusCode = found.Status;
+			context.Response.Headers.Add(found.Headers);
+			WriteResponseBody(context, found);
+			utils.PrintOutgoing(Name, context);
 
-        private Response FindEndpoint(HttpListenerContext context) {
+			_invocationDb.Add(incoming.ToInvocation());
+		}
 
-            var incoming = new Endpoint
-            {
-                Request = {
-               Url = context.Request.Url.AbsolutePath,
-               Method = new List<string> {context.Request.HttpMethod.ToUpper()},
-               Headers = CreateNameValueCollection(context.Request.Headers, caseSensitiveKeys: false),
-               Query = CreateNameValueCollection(context.Request.QueryString),
-               Post = utils.ReadPost(context.Request)
-            }
-            };
-
-            var found = _endpointDb.Find(incoming);
-            return found;
-        }
-
-        private static void WriteResponseBody(HttpListenerContext context, Response found) {
+    	private static void WriteResponseBody(HttpListenerContext context, Response found) {
             string body;
 
             try {
@@ -93,16 +83,6 @@ namespace stubby.Portals {
             }
 
             utils.WriteBody(context, body);
-        }
-
-        private static NameValueCollection CreateNameValueCollection(NameValueCollection collection, bool caseSensitiveKeys = true) {
-            var newCollection = new NameValueCollection();
-
-            foreach(var key in collection.AllKeys) {
-                newCollection.Add(caseSensitiveKeys ? key : key.ToLower(), collection.Get(key));
-            }
-
-            return newCollection;
         }
 
         private void AsyncHandler(IAsyncResult result) {
