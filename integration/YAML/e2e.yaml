@@ -58,8 +58,8 @@
     url: /get/query
     method: GET
     query:
-      first: 'value1again'
-      second: 'value2again'
+      first: 'valueagain1'
+      second: 'valueagain2'
   response:
     status: 200
     body: second query

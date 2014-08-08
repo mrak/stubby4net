@@ -13,6 +13,7 @@ namespace stubby.Portals {
         private const string Name = "admin";
         private const string PingUrl = "/ping";
         private const string StatusUrl = "/status";
+		private const string InvocationsUrl = "/invocations";
         private const string Root = "/";
         private const string IdUrls = @"^\/[1-9][0-9]*$";
         private const int UnprocessableEntity = 422;
@@ -20,17 +21,22 @@ namespace stubby.Portals {
          "The request was well-formed but was unable to be followed due to semantic errors.";
         private const string Pong = "pong";
         private readonly EndpointDb _endpointDb;
+    	private readonly InvocationDb _invocationDb;
         private readonly IDictionary<string, Action<HttpListenerContext>> _idmethods;
         private readonly HttpListener _listener;
         private readonly IDictionary<string, Action<HttpListenerContext>> _pingmethods;
         private readonly IDictionary<string, Action<HttpListenerContext>> _rootmethods;
         private readonly IDictionary<string, Action<HttpListenerContext>> _statusmethods;
+    	private readonly IDictionary<string, Action<HttpListenerContext>> _invocationMethods;
 
-        public Admin(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {
+		public Admin(EndpointDb endpointDb, InvocationDb invocationDb)
+			: this(endpointDb, invocationDb, new HttpListener())
+		{
         }
 
-        public Admin(EndpointDb endpointDb, HttpListener listener) {
+        public Admin(EndpointDb endpointDb, InvocationDb invocationDb, HttpListener listener) {
             _endpointDb = endpointDb;
+        	_invocationDb = invocationDb;
             _listener = listener;
             _pingmethods = new Dictionary<string, Action<HttpListenerContext>>
             {
@@ -68,6 +74,13 @@ namespace stubby.Portals {
                 {"POST", GoPost},
                 {"DELETE", GoDeleteAll}
             };
+        	_invocationMethods = new Dictionary<string, Action<HttpListenerContext>>(StringComparer.OrdinalIgnoreCase)
+        	{
+        		{"GET", GoInvocations},
+				{"POST", GoInvocations},
+				{"PUT", GoInvocations},
+				{"DELETE", GoInvocations},
+        	};
         }
 
         public void Dispose() {
@@ -99,6 +112,8 @@ namespace stubby.Portals {
                 methods = _rootmethods;
             else if(Regex.IsMatch(url, IdUrls))
                 methods = _idmethods;
+			else if (Regex.IsMatch(url, InvocationsUrl))
+                methods = _invocationMethods;
             else {
                 utils.SetStatus(context, HttpStatusCode.NotFound);
                 return;
@@ -109,6 +124,27 @@ namespace stubby.Portals {
             else
                 GoInvalid(context, methods.Keys);
         }
+
+		private void GoInvocations(HttpListenerContext context)
+		{
+			var incoming = context.ToInvocation();
+			incoming.Url = Regex.Replace(incoming.Url, InvocationsUrl, String.Empty, RegexOptions.IgnoreCase);
+			IList<string> ignoredHeaders;
+			if (incoming.Headers.TryGetValue("x-ignore", out ignoredHeaders))
+			{
+				foreach (var ignoredHeader in ignoredHeaders)
+				{
+					var ignoredItems = ignoredHeader.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var ignoredItem in ignoredItems)
+					{
+						incoming.Headers.Remove(ignoredItem);
+					}
+				}
+				incoming.Headers.Remove("x-ignore");
+			}
+			var invocations = _invocationDb.Find(incoming);
+			utils.SerializeToJson(invocations, context);
+		}
 
         private void GoGetAll(HttpListenerContext context) {
             var all = _endpointDb.Fetch();
