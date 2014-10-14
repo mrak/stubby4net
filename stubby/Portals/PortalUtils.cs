@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Json;
@@ -66,6 +68,14 @@ namespace stubby.Portals {
         public static void WriteBody(HttpListenerContext context, string body) {
             using(var writer = new StreamWriter(context.Response.OutputStream)) {
                 writer.Write(body);
+            }
+        }
+
+        public static void WriteResponse(HttpListenerContext context, Bitmap image, ImageFormat imageFormat)
+        {
+            using (var ms = new MemoryStream()){
+                image.Save(ms, imageFormat);
+                ms.WriteTo(context.Response.OutputStream);
             }
         }
 

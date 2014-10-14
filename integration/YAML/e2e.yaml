@@ -122,13 +122,19 @@
       Content-Type: text/plain
     body: body contents!
 
+
 - request:
     url: /file/body/missingfile$
   response:
     file: endpoints-nonexistant.file
     body: body contents!
 
-
+- request: 
+    url: /file/image.png
+  response: 
+    file: image.png
+    headers: 
+      Content-Type: image/png
 
 - request:
     url: /file/post$
@@ -147,3 +153,4 @@
   response:
     - status: 200
     - status: 400
+

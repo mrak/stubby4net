@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using stubby.Domain;
@@ -77,23 +79,60 @@ namespace stubby.Portals {
             return found;
         }
 
-        private static void WriteResponseBody(HttpListenerContext context, Response found) {
+        private static void WriteResponseBody(HttpListenerContext context, Response found)
+        {
             string body;
 
-            try {
-                body = File.ReadAllText(found.File).TrimEnd(new[]
+            try
+            {
+                var extension = Path.GetExtension(found.File).ToLower();
+                var imageFormat = GetImageFormat(extension);
+                if (imageFormat != null)
                 {
-                    ' ',
-                    '\n',
-                    '\r',
-                    '\t'
-                });
-            } catch {
+                    using (var image = new Bitmap(found.File))
+                    {
+                        utils.WriteResponse(context, image, imageFormat);
+                    }
+                }
+                else
+                {
+                    body = File.ReadAllText(found.File).TrimEnd(new[]
+                    {
+                        ' ',
+                        '\n',
+                        '\r',
+                        '\t'
+                    });
+                    utils.WriteBody(context, body);
+                }
+            }
+            catch (Exception)
+            {
                 body = found.Body;
+                utils.WriteBody(context, body);
             }
 
-            utils.WriteBody(context, body);
         }
+
+        private static ImageFormat GetImageFormat(string extension)
+        {
+            switch (extension)
+            {
+                case ".jpeg":
+                    return ImageFormat.Jpeg;
+                case ".jpg":
+                    return ImageFormat.Jpeg;
+                case ".png":
+                    return ImageFormat.Png;
+                case ".gif":
+                    return ImageFormat.Gif;
+                case ".ico":
+                    return ImageFormat.Icon;
+            }
+
+            return null;
+        }
+
 
         private static NameValueCollection CreateNameValueCollection(NameValueCollection collection, bool caseSensitiveKeys = true) {
             var newCollection = new NameValueCollection();
