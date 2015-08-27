@@ -10,7 +10,7 @@ namespace stubby.Domain {
         private const string Loaded = "Loaded {0} {1}";
         private readonly ConcurrentDictionary<uint, Endpoint> _dictionary = new ConcurrentDictionary<uint, Endpoint>();
         private readonly object _lock = new object();
-        private uint _nextId;
+        private uint _nextId = 1;
         private IDictionary<uint, int> _sightings = new Dictionary<uint, int>();
 
         public bool Notify { get; set; }
