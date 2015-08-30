@@ -54,6 +54,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="TestUtils.cs" />
+    <Compile Include="ViaAdminTest.cs" />
     <Compile Include="ViaFileTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
