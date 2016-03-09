@@ -1,13 +1,20 @@
-﻿namespace stubby {
+﻿namespace stubby
+{
 
     /// <summary>
     /// The options container class used by Stubby constructors.
     /// </summary>
-    public class Arguments : IArguments {
+    public class Arguments : IArguments
+    {
         ///<summary>
         /// Port for admin portal. Defaults to 8889.
         ///</summary>
         public uint Admin { get; set; }
+
+        /// <summary>
+        /// If true, admin portal will not be started
+        /// </summary>
+        public bool DisableAdmin { get; set; }
 
         ///<summary>
         /// Port for stubs portal. Defaults to 8882.
@@ -18,6 +25,11 @@
         /// Port for stubs https portal. Defaults to 7443.
         ///</summary>
         public uint Tls { get; set; }
+
+        /// <summary>
+        /// If true, tls listener will not be started
+        /// </summary>
+        public bool DisableTls { get; set; }
 
         ///<summary>
         /// Hostname at which to bind stubby. Defaults to localhost.
@@ -39,10 +51,13 @@
         ///</summary>
         public bool Mute { get; set; }
 
-        public Arguments() {
+        public Arguments()
+        {
             Admin = 8889;
+            DisableAdmin = false;
             Stubs = 8882;
             Tls = 7443;
+            DisableTls = false;
             Location = "localhost";
             Data = null;
             Mute = true;

@@ -9,12 +9,14 @@ using stubby.Domain;
 using stubby.Exceptions;
 using stubby.Portals;
 
-namespace stubby {
+namespace stubby
+{
 
     /// <summary>
     /// The main stubby class whose instances host stubbed endpoints.
     /// </summary>
-    public class Stubby : IDisposable {
+    public class Stubby : IDisposable
+    {
         internal static readonly Guid Guid = Assembly.GetExecutingAssembly().GetType().GUID;
         internal static readonly string Version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion;
         private readonly FileSystemWatcher _watcher = new FileSystemWatcher();
@@ -26,22 +28,24 @@ namespace stubby {
         /// <summary>
         /// Construct stubby with default parameters.
         /// </summary>
-        public Stubby() : this(new Arguments()) {
+        public Stubby() : this(new Arguments())
+        {
         }
 
         /// <summary>
         /// Costruct with specific options.
         /// </summary>
         /// <param name="arguments">The collection of options used by stubby.</param>
-        public Stubby(IArguments arguments) {
+        public Stubby(IArguments arguments)
+        {
             _arguments = arguments ?? new Arguments { Mute = true };
-            _admin = new Admin(_endpointDb);
+            _admin = arguments.DisableAdmin ? null : new Admin(_endpointDb);
             _stubs = new Stubs(_endpointDb);
 
             Out.Mute = _arguments.Mute;
             LoadEndpoints();
 
-            if(!_arguments.Watch)
+            if (!_arguments.Watch)
                 return;
 
             _watcher.Path = Path.GetDirectoryName(_arguments.Data);
@@ -50,8 +54,12 @@ namespace stubby {
             _watcher.EnableRaisingEvents = _arguments.Watch;
         }
 
-        public void Dispose() {
-            _admin.Dispose();
+        public void Dispose()
+        {
+            if (!_arguments.DisableAdmin)
+            {
+                _admin.Dispose();
+            }
             _stubs.Dispose();
             _watcher.Dispose();
         }
@@ -59,22 +67,28 @@ namespace stubby {
         /// <summary>
         /// Start stubby's services
         /// </summary>
-        public void Start() {
+        public void Start()
+        {
             StartPortals();
         }
 
         /// <summary>
         /// Stop stubby's services
         /// </summary>
-        public void Stop() {
-            _admin.Stop();
+        public void Stop()
+        {
+            if (!_arguments.DisableAdmin)
+            {
+                _admin.Stop();
+            }
             _stubs.Stop();
         }
 
         /// <summary>
         /// Get a listing of all of stubby's configured endpoints
         /// </summary>
-        public IList<Endpoint> GetAll() {
+        public IList<Endpoint> GetAll()
+        {
             return _endpointDb.Fetch();
         }
 
@@ -82,7 +96,8 @@ namespace stubby {
         /// Get an endpoint back by id
         /// </summary>
         /// <param name="id">The id of the endpoint to retrieve</param>
-        public Endpoint Get(uint id) {
+        public Endpoint Get(uint id)
+        {
             return _endpointDb.Fetch(id);
         }
 
@@ -90,7 +105,8 @@ namespace stubby {
         /// Find an endpoint by it's matching Request
         /// </summary>
         /// <param name="request">The signature of the request to find by</param>
-        public Response Find(Request request) {
+        public Response Find(Request request)
+        {
             return _endpointDb.Find(new Endpoint { Request = request });
         }
 
@@ -100,7 +116,8 @@ namespace stubby {
         /// <param name="id">The id of the endpoint to replace</param>
         /// <param name="endpoint">The new endpoint data</param>
         /// <returns>True if the operation succeeded</returns>
-        public bool Replace(uint id, Endpoint endpoint) {
+        public bool Replace(uint id, Endpoint endpoint)
+        {
             return _endpointDb.Replace(id, endpoint);
         }
 
@@ -109,7 +126,8 @@ namespace stubby {
         /// </summary>
         /// <param name="endpoints">An &lt;id, endpoint&gt; Map of endpoints to swap out</param>
         /// <returns>True if all given endpoints were replaced</returns>
-        public bool Replace(IEnumerable<KeyValuePair<uint, Endpoint>> endpoints) {
+        public bool Replace(IEnumerable<KeyValuePair<uint, Endpoint>> endpoints)
+        {
             return _endpointDb.Replace(endpoints);
         }
 
@@ -118,14 +136,16 @@ namespace stubby {
         /// </summary>
         /// <param name="id">The id as returned by Add(..) or the Admin portal listing.</param>
         /// <returns>True if the operation succeeded</returns>
-        public bool Delete(uint id) {
+        public bool Delete(uint id)
+        {
             return _endpointDb.Delete(id);
         }
 
         /// <summary>
         /// Remove all configured endpoints from stubby
         /// </summary>
-        public void DeleteAll() {
+        public void DeleteAll()
+        {
             _endpointDb.Delete();
         }
 
@@ -135,7 +155,8 @@ namespace stubby {
         /// <param name="endpoint">The new endpoint data</param>
         /// <param name="id">The new generated id, for use with Replace/Delete</param>
         /// <returns>True if the operation succeeded</returns>
-        public bool Add(Endpoint endpoint, out uint id) {
+        public bool Add(Endpoint endpoint, out uint id)
+        {
             return _endpointDb.Insert(endpoint, out id);
         }
 
@@ -145,18 +166,25 @@ namespace stubby {
         /// <param name="endpoints">The new endpoints data</param>
         /// <param name="ids">The new generated ids of the inserted endpoints</param>
         /// <returns>True if all endpoints were added</returns>
-        public bool Add(IEnumerable<Endpoint> endpoints, out IList<uint> ids) {
+        public bool Add(IEnumerable<Endpoint> endpoints, out IList<uint> ids)
+        {
             return _endpointDb.Insert(endpoints, out ids);
         }
 
-        private void LoadEndpoints() {
+        private void LoadEndpoints()
+        {
             IList<Endpoint> endpoints = new List<Endpoint>();
 
-            try {
+            try
+            {
                 endpoints = YamlParser.FromFile(_arguments.Data);
-            } catch(FileNotFoundException) {
+            }
+            catch (FileNotFoundException)
+            {
                 Out.Warn("File '" + _arguments.Data + "' couldn't be found. Ignoring...");
-            } catch(YamlException ex) {
+            }
+            catch (YamlException ex)
+            {
                 Out.Error(ex.Message);
                 throw new EndpointParsingException("Could not parse endpoints due to YAML errors.", ex);
             }
@@ -165,15 +193,20 @@ namespace stubby {
             _endpointDb.Insert(endpoints);
         }
 
-        private void StartPortals() {
+        private void StartPortals()
+        {
             Out.Linefeed();
-            _admin.Start(_arguments.Location, _arguments.Admin);
-            _stubs.Start(_arguments.Location, _arguments.Stubs, _arguments.Tls);
+            if (!_arguments.DisableAdmin)
+            {
+                _admin.Start(_arguments.Location, _arguments.Admin);
+            }
+            _stubs.Start(_arguments.Location, _arguments.Stubs, _arguments.Tls, _arguments.DisableTls);
             Out.Linefeed();
         }
 
-        private void OnDatafileChange(object sender, FileSystemEventArgs e) {
-            if(e.ChangeType != WatcherChangeTypes.Changed)
+        private void OnDatafileChange(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType != WatcherChangeTypes.Changed)
                 return;
 
             _endpointDb.Notify = false;

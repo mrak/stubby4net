@@ -8,53 +8,68 @@ using System.Net;
 using stubby.Domain;
 using utils = stubby.Portals.PortalUtils;
 
-namespace stubby.Portals {
+namespace stubby.Portals
+{
 
-    internal class Stubs : IDisposable {
+    internal class Stubs : IDisposable
+    {
         private const string Name = "stubs";
         private const string UnregisteredEndoint = "is not a registered endpoint";
         private const string UnexpectedError = "unexpectedtly generated a server error";
         private readonly EndpointDb _endpointDb;
         private readonly HttpListener _listener;
 
-        public Stubs(EndpointDb endpointDb) : this(endpointDb, new HttpListener()) {
+        public Stubs(EndpointDb endpointDb) : this(endpointDb, new HttpListener())
+        {
         }
 
-        public Stubs(EndpointDb endpointDb, HttpListener listener) {
+        public Stubs(EndpointDb endpointDb, HttpListener listener)
+        {
             _endpointDb = endpointDb;
             _listener = listener;
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             _listener.Stop();
         }
 
-        public void Stop() {
+        public void Stop()
+        {
             _listener.Stop();
         }
 
-        public void Start(string location, uint port, uint httpsPort) {
+        public void Start(string location, uint port, uint httpsPort, bool disableHttps)
+        {
             _listener.Prefixes.Add(utils.BuildUri(location, port));
-            _listener.Prefixes.Add(utils.BuildUri(location, httpsPort, true));
+            if (!disableHttps)
+            {
+                _listener.Prefixes.Add(utils.BuildUri(location, httpsPort, true));
+            }
 
             _listener.Start();
             _listener.BeginGetContext(AsyncHandler, _listener);
 
             utils.PrintListening(Name, location, port);
-            utils.PrintListening(Name, location, httpsPort);
+            if (!disableHttps)
+            {
+                utils.PrintListening(Name, location, httpsPort);
+            }
         }
 
-        private void ResponseHandler(HttpListenerContext context) {
+        private void ResponseHandler(HttpListenerContext context)
+        {
             var found = FindEndpoint(context);
 
-            if(found == null) {
-                context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+            if (found == null)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 utils.PrintOutgoing(Name, context, UnregisteredEndoint);
                 return;
             }
 
-            if(found.Latency > 0)
-                System.Threading.Thread.Sleep((int) found.Latency);
+            if (found.Latency > 0)
+                System.Threading.Thread.Sleep((int)found.Latency);
 
             context.Response.StatusCode = found.Status;
             context.Response.Headers.Add(found.Headers);
@@ -62,7 +77,8 @@ namespace stubby.Portals {
             utils.PrintOutgoing(Name, context);
         }
 
-        private Response FindEndpoint(HttpListenerContext context) {
+        private Response FindEndpoint(HttpListenerContext context)
+        {
 
             var incoming = new Endpoint
             {
@@ -134,30 +150,39 @@ namespace stubby.Portals {
         }
 
 
-        private static NameValueCollection CreateNameValueCollection(NameValueCollection collection, bool caseSensitiveKeys = true) {
+        private static NameValueCollection CreateNameValueCollection(NameValueCollection collection, bool caseSensitiveKeys = true)
+        {
             var newCollection = new NameValueCollection();
 
-            foreach(var key in collection.AllKeys) {
+            foreach (var key in collection.AllKeys)
+            {
                 newCollection.Add(caseSensitiveKeys ? key : key.ToLower(), collection.Get(key));
             }
 
             return newCollection;
         }
 
-        private void AsyncHandler(IAsyncResult result) {
+        private void AsyncHandler(IAsyncResult result)
+        {
             HttpListenerContext context;
-            try {
+            try
+            {
                 context = _listener.EndGetContext(result);
-            } catch(HttpListenerException) {
+            }
+            catch (HttpListenerException)
+            {
                 return;
             }
 
             utils.PrintIncoming(Name, context);
             utils.SetServerHeader(context);
 
-            try {
+            try
+            {
                 ResponseHandler(context);
-            } catch {
+            }
+            catch
+            {
                 utils.SetStatus(context, HttpStatusCode.InternalServerError);
                 utils.PrintOutgoing(Name, context, UnexpectedError);
             }

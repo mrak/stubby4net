@@ -1,13 +1,20 @@
-﻿namespace stubby {
+﻿namespace stubby
+{
 
     /// <summary>
     /// The options container class used by Stubby constructors.
     /// </summary>
-    public interface IArguments {
+    public interface IArguments
+    {
         /// <summary>
         /// Port for admin portal.
         /// </summary>
         uint Admin { get; set; }
+
+        /// <summary>
+        /// If true, admin portal will not be started
+        /// </summary>
+        bool DisableAdmin { get; set; }
 
         /// <summary>
         /// Port for stubs portal.
@@ -18,6 +25,11 @@
         /// Port for stubs https portal.
         /// </summary>
         uint Tls { get; set; }
+
+        /// <summary>
+        /// If true, tls listener will not be started
+        /// </summary>
+        bool DisableTls { get; set; }
 
         /// <summary>
         /// Hostname at which to bind stubby.
