@@ -8,12 +8,18 @@ namespace stubby.CLI {
         [Option('a', "admin", DefaultValue = (uint) 8889, HelpText = "Port for admin portal. Defaults to 8889.")]
         public uint Admin { get; set; }
 
+        //as we are in CLI, disabling admin is not something you want
+        public bool DisableAdmin { get; set; }
+
         [Option('s', "stubs", DefaultValue = (uint) 8882, HelpText = "Port for stubs portal. Defaults to 8882.")]
         public uint Stubs { get; set; }
 
         [Option('t', "tls", DefaultValue = (uint) 7443, HelpText = "Port for https stubs portal. Defaults to 7443.")]
         public uint Tls { get; set; }
 
+        //as we are in CLI, disabling TLS is not necessary
+        public bool DisableTls { get; set; }
+        
         [Option('l', "location", DefaultValue = "localhost", HelpText = "Hostname at which to bind stubby.")]
         public string Location { get; set; }
 
@@ -28,6 +34,8 @@ namespace stubby.CLI {
 
         [Option('v', "version", HelpText = "Print stubby's version number.")]
         public bool Version { get; set; }
+
+        
 
         [HelpOption]
         public string GetUsage() {
